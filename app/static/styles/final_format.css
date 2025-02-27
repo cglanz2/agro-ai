@@ -12,7 +12,6 @@
     background-color: rgba(0,0,0,0.9);
 }
 
-
 .modal-content {
     margin: auto;
     display: block;
@@ -73,4 +72,19 @@
     color: #bbb;
     text-decoration: none;
     cursor: pointer;
+}
+
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background-color: #ffffff;
+    width: 100%;
+    box-shadow: 0 4px 2px -2px gray;
+  }
+
+  body {
+    margin-top: 70px;
 }

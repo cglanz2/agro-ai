@@ -4,7 +4,11 @@ This method is responsible for the inner workings of the different web pages in 
 """
 from flask import Flask
 from flask import render_template, flash, redirect, url_for, session, request, jsonify
-from app import app
+from flask_login import LoginManager, login_user, login_required, current_user, logout_user
+from app import app, db
+from app.models import User
+from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash
 from app.DataPreprocessing import DataPreprocessing
 from app.ML_Class import Active_ML_Model, AL_Encoder, ML_Model
 from app.SamplingMethods import lowestPercentage
@@ -18,6 +22,10 @@ import boto3
 from io import StringIO
 
 bootstrap = Bootstrap(app)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"  # Redirect to login page if user is not logged in
 
 def getData():
     """
@@ -174,16 +182,123 @@ def prepairResults(form):
         health_pic_user, blight_pic_user, health_pic, blight_pic, health_pic_prob, blight_pic_prob = ml_model.infoForResults(train_img_names, test_set)
         return render_template('final.html', form = form, confidence = "{:.2%}".format(round(session['confidence'],4)), health_user = health_pic_user, blight_user = blight_pic_user, healthNum_user = len(health_pic_user), blightNum_user = len(blight_pic_user), health_test = health_pic, unhealth_test = blight_pic, healthyNum = len(health_pic), unhealthyNum = len(blight_pic), healthyPct = "{:.2%}".format(len(health_pic)/(200-(len(health_pic_user)+len(blight_pic_user)))), unhealthyPct = "{:.2%}".format(len(blight_pic)/(200-(len(health_pic_user)+len(blight_pic_user)))), h_prob = health_pic_prob, b_prob = blight_pic_prob)
 
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+def get_user_by_email(email):
+    return User.query.filter_by(email=email).first()
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        
+        # Look for the user in the database
+        user = User.query.filter_by(email=email).first()
+
+        if user and check_password_hash(user.password, password):
+            # Login the user and redirect to a protected page
+            login_user(user)
+            return redirect(url_for('label'))  # Replace 'home' with the appropriate route
+        else:
+            flash('Login failed. Please check your email and password and try again.', 'danger')
+    
+    return render_template('login.html')  # Render the login form if it's a GET request
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        # Get form data
+        email = request.form['email']
+        password = request.form['password']
+        retype_password = request.form['retype-password']
+
+        # Validate the passwords match
+        if password != retype_password:
+            flash('Passwords do not match!', 'danger')
+            return redirect(url_for('register'))
+
+        # Check if the email already exists in the database
+        existing_user = User.query.filter_by(email=email).first()
+        if existing_user:
+            flash('Email already exists. Please log in.', 'danger')
+            return redirect(url_for('login'))
+
+        # Hash the password
+        hashed_password = generate_password_hash(password)
+
+        # Create the new user
+        new_user = User(email=email, password=hashed_password)
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash('Registration successful! You can now log in.', 'success')
+        return redirect(url_for('login'))  # Redirect to login page after successful registration
+
+    return render_template('register.html')
+
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    if request.method == 'POST':
+        email = request.form['email']
+        current_password = request.form['current_password']
+        new_password = request.form['new_password']
+        confirm_password = request.form['confirm_password']
+        
+        # Get the user from the database
+        user = get_user_by_email(email)
+        
+        # Check if the user exists and the current password is correct
+        if user and user.check_password(current_password):
+            # Check if the new passwords match
+            if new_password == confirm_password:
+                # Update the user's password
+                user.set_password(new_password)  # Make sure you have a method to hash and set the password
+                
+                # Commit the changes to the database
+                db.session.commit()
+                
+                flash('Password updated successfully!', 'success')
+            else:
+                flash('New passwords do not match.', 'error')
+        else:
+            flash('Current password is incorrect.', 'error')
+
+        return redirect(url_for('profile'))
+
+    return render_template('profile.html')
+
+@app.route('/saved')
+@login_required
+def saved():
+    return render_template('saved.html')
+
 @app.route("/", methods=['GET'])
-@app.route("/index.html",methods=['GET'])
+@app.route("/index.html", methods=['GET'])
 def home():
     """
-    Operates the root (/) and index(index.html) web pages.
+    Redirects users based on login status:
+    - If logged in, redirect to label.html
+    - If not logged in, redirect to index.html
     """
-    session.pop('model', None)
-    return render_template('index.html')
+    if session.get('user_logged_in'):  # Replace with the actual session check
+        return render_template('label.html')
+    else:
+        return render_template('index.html')
+
 
 @app.route("/label.html",methods=['GET', 'POST'])
+@login_required
 def label():
     """
     Operates the label(label.html) web page.
@@ -205,6 +320,7 @@ def label():
     return render_template('label.html', form = form)
 
 @app.route("/intermediate.html",methods=['GET'])
+@login_required
 def intermediate():
     """
     Operates the intermediate(intermediate.html) web page.
@@ -212,6 +328,7 @@ def intermediate():
     return render_template('intermediate.html')
 
 @app.route("/final.html",methods=['GET'])
+@login_required
 def final():
     """
     Operates the final(final.html) web page.
@@ -219,6 +336,7 @@ def final():
     return render_template('final.html')
 
 @app.route("/feedback/<h_list>/<u_list>/<h_conf_list>/<u_conf_list>",methods=['GET'])
+@login_required
 def feedback(h_list,u_list,h_conf_list,u_conf_list):
     """
     Operates the feedback(feedback.html) web page.

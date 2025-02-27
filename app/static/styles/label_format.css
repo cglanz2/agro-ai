@@ -5,24 +5,27 @@ body {
   -o-background-size: cover;
   background-size: cover;
   background-repeat: no-repeat;
-}
-.active_button {
-  padding: 10px 20px;
-  font-size: 18px;
-  text-align: center;
-  cursor: pointer;
-  outline: none;
-  color: #fff;
-  background-color: #4CAF50;
-  border: none;
-  border-radius: 15px;
-  box-shadow: 0 9px #999;
+  margin: 0;
+  margin-top: 70px;
+  padding: 0;
 }
 
-.active_button:hover {background-color: #3e8e41}
-
-.active_button:active {
-  background-color: #3e8e41;
-  box-shadow: 0 5px #666;
-  transform: translateY(4px);
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background-color: #ffffff;
+  width: 100%;
+  box-shadow: 0 4px 2px -2px gray;
 }
+
+.main-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 140px);
+  margin: 0;
+}
+
