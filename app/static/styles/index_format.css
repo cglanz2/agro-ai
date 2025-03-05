@@ -6,12 +6,16 @@
 .start,
 .image {
 	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;  /* Vertically center */
+	align-items: center;      /* Horizontally center */
 }
 
 .bg-image {
 	background-image: url(https://miro.medium.com/max/1400/1*LhaMBgHAh9lAOWo4KQuRPA.jpeg);
 	background-size: auto;
-	background-position: cover;
+	background-position: center center; /* Center the background image */
 	background-repeat: no-repeat;
 }
 
@@ -26,6 +30,35 @@
 	padding: 0.75rem 1rem;
 	border-radius: 2rem;
 }
+
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background-color: #ffffff;
+    width: 100%;
+    box-shadow: 0 4px 2px -2px gray;
+  }
+
+  .flash {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.flash.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.flash.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
 
 
 

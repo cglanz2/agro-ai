@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/index_format.css') }}">
+
+<body style="height: 100%; overflow: hidden;">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+        <span class="navbar-brand">AI for Agriculture</span>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/label.html">Train</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/saved">Saved</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Profile
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/profile">Update Profile</a>
+                        <a class="dropdown-item" href="{{ url_for('logout') }}">Log Out</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh; overflow: hidden;">
+        <div class="col-md-6">
+            <h2 class="text-center mb-4">Update Profile</h2>
+            <form action="{{ url_for('profile') }}" method="POST">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="current_password">Current Password</label>
+                    <input type="password" class="form-control" id="current_password" name="current_password" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_password">New Password</label>
+                    <input type="password" class="form-control" id="new_password" name="new_password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password">Confirm New Password</label>
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                </div>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul class="flashes">
+                        {% for category, message in messages %}
+                            <li class="flash {{ category }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% endwith %}
+                
+                <button type="submit" class="btn btn-primary btn-block">Update Profile</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock %}
