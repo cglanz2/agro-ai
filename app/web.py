@@ -6,7 +6,7 @@ from flask import Flask
 from flask import render_template, flash, redirect, url_for, session, request, jsonify
 from flask_login import LoginManager, login_user, login_required, current_user, logout_user
 from app import app, db
-from app.models import User
+from app.models import User, Label, Image
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from app.DataPreprocessing import DataPreprocessing
@@ -72,7 +72,7 @@ def createMLModel(data):
 
 def renderLabel(form):
     """
-    prepairs a render_template to show the label.html web page.
+    Prepares a render_template to show the label.html web page.
 
     Parameters
     ----------
@@ -162,7 +162,23 @@ def prepairResults(form):
     """
     session['labels'].append(form.choice.data)
     session['sample'] = tuple(zip(session['sample_idx'], session['labels']))
+    
+    # Ensure user is logged in and user_id is available
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))
 
+    # Retrieve user_id from the logged-in user (current_user)
+    user_id = current_user.id
+    
+    #loops through session['session'] and adds the image and label to the database
+    for filename, label in session['sample']:
+        new_image = Image(filename=filename, user_id=user_id, label=label)
+        db.session.add(new_image)
+        db.session.commit()
+        new_label = Label(text=label, image_id=new_image.id, user_id=user_id)
+        db.session.add(new_label)
+        db.session.commit()
+        
     if session['train'] != None:
         session['train'] = session['train'] + session['sample']
     else:
