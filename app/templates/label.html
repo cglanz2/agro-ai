@@ -47,10 +47,12 @@
                         </p>
                         <br>
                         <p>&#10146; Use the buttons to label an image as "Healthy" or "Unhealthy"</p>
-                        <form class="form form-horizontal" action="" method="post">
-                            <p>{{form.choice()}}</p>
-                            <p>{{form.submit()}}</p>
-                        </form><br>
+                        <form method="POST">
+                            {{ form.hidden_tag() }}
+                            <p>{{ form.choice.label }}</p>
+                            <p>{{ form.choice() }}</p>
+                            <p>{{ form.submit() }}</p>
+                        </form>                        
                     </div>
                 </div>
             </div>
