@@ -1,0 +1,794 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>app package &mdash; agro-ai 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=2709fde1"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="config module" href="config.html" />
+    <link rel="prev" title="agro-ai" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            agro-ai
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">agro-ai</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">app package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-app.DataPreprocessing">app.DataPreprocessing module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#app.DataPreprocessing.DataPreprocessing"><code class="docutils literal notranslate"><span class="pre">DataPreprocessing</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#app-imagepreprocessing-module">app.ImagePreprocessing module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-app.ML_Class">app.ML_Class module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#app.ML_Class.AL_Encoder"><code class="docutils literal notranslate"><span class="pre">AL_Encoder</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.ML_Class.Active_ML_Model"><code class="docutils literal notranslate"><span class="pre">Active_ML_Model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.ML_Class.ML_Model"><code class="docutils literal notranslate"><span class="pre">ML_Model</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-app.SamplingMethods">app.SamplingMethods module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#app.SamplingMethods.lowestPercentage"><code class="docutils literal notranslate"><span class="pre">lowestPercentage()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-app.forms">app.forms module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#app.forms.LabelForm"><code class="docutils literal notranslate"><span class="pre">LabelForm</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-app.models">app.models module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#app.models.Image"><code class="docutils literal notranslate"><span class="pre">Image</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.models.Label"><code class="docutils literal notranslate"><span class="pre">Label</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.models.User"><code class="docutils literal notranslate"><span class="pre">User</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-app.web">app.web module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#app.web.createMLModel"><code class="docutils literal notranslate"><span class="pre">createMLModel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.web.feedback"><code class="docutils literal notranslate"><span class="pre">feedback()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.web.final"><code class="docutils literal notranslate"><span class="pre">final()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.web.getData"><code class="docutils literal notranslate"><span class="pre">getData()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.web.getNextSetOfImages"><code class="docutils literal notranslate"><span class="pre">getNextSetOfImages()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.web.get_user_by_email"><code class="docutils literal notranslate"><span class="pre">get_user_by_email()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.web.home"><code class="docutils literal notranslate"><span class="pre">home()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.web.initializeAL"><code class="docutils literal notranslate"><span class="pre">initializeAL()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.web.intermediate"><code class="docutils literal notranslate"><span class="pre">intermediate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.web.label"><code class="docutils literal notranslate"><span class="pre">label()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.web.load_user"><code class="docutils literal notranslate"><span class="pre">load_user()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.web.login"><code class="docutils literal notranslate"><span class="pre">login()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.web.logout"><code class="docutils literal notranslate"><span class="pre">logout()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.web.prepairResults"><code class="docutils literal notranslate"><span class="pre">prepairResults()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.web.profile"><code class="docutils literal notranslate"><span class="pre">profile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.web.register"><code class="docutils literal notranslate"><span class="pre">register()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.web.renderLabel"><code class="docutils literal notranslate"><span class="pre">renderLabel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.web.saved"><code class="docutils literal notranslate"><span class="pre">saved()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-app">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="config.html">config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flask_app.html">flask_app module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test_app.html">test_app module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">agro-ai</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">agro-ai</a></li>
+      <li class="breadcrumb-item active">app package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/app.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="app-package">
+<h1>app package<a class="headerlink" href="#app-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-app.DataPreprocessing">
+<span id="app-datapreprocessing-module"></span><h2>app.DataPreprocessing module<a class="headerlink" href="#module-app.DataPreprocessing" title="Link to this heading"></a></h2>
+<p>Created on Sat Feb  8 11:21:32 2020</p>
+<p>&#64;author: Donovan</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="app.DataPreprocessing.DataPreprocessing">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.DataPreprocessing.</span></span><span class="sig-name descname"><span class="pre">DataPreprocessing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">standard_scaling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pca</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/DataPreprocessing.html#DataPreprocessing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.DataPreprocessing.DataPreprocessing" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class object prepares the data for classification.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="app.DataPreprocessing.DataPreprocessing.fit_transform">
+<span class="sig-name descname"><span class="pre">fit_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_train</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/DataPreprocessing.html#DataPreprocessing.fit_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.DataPreprocessing.DataPreprocessing.fit_transform" title="Link to this definition"></a></dt>
+<dd><p>This function fits and transforms the data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X_train</strong> (<em>pandas DataFrame</em>) – The data to be transformed.</p></li>
+<li><p><strong>Modified</strong> (<em>Attributes</em>)</p></li>
+<li><p><strong>-------------------</strong></p></li>
+<li><p><strong>sc</strong> (<em>standard scaler object</em><em> or </em><em>None</em>) – Used to scale features fitted to the data</p></li>
+<li><p><strong>norm</strong> (<em>Normalizer object</em><em> or </em><em>None</em>) – Used to normalize features fitted to the data</p></li>
+<li><p><strong>pca</strong> (<em>PCA object</em>) – Used to perform principal component analysis on features fitted to the data</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>X_train</strong> – The preprocessed data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="app.DataPreprocessing.DataPreprocessing.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_test</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/DataPreprocessing.html#DataPreprocessing.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.DataPreprocessing.DataPreprocessing.transform" title="Link to this definition"></a></dt>
+<dd><p>Transforms new data before prediction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>X_test</strong> (<em>pandas DataFrame</em>) – The data to be transformed.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>X_test</strong> – The preprocessed data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="app-imagepreprocessing-module">
+<h2>app.ImagePreprocessing module<a class="headerlink" href="#app-imagepreprocessing-module" title="Link to this heading"></a></h2>
+</section>
+<section id="module-app.ML_Class">
+<span id="app-ml-class-module"></span><h2>app.ML_Class module<a class="headerlink" href="#module-app.ML_Class" title="Link to this heading"></a></h2>
+<p>Created on Thu Feb  6 12:54:45 2020
+&#64;author: Donovan</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="app.ML_Class.AL_Encoder">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.ML_Class.</span></span><span class="sig-name descname"><span class="pre">AL_Encoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">skipkeys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ensure_ascii</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_circular</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/ML_Class.html#AL_Encoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.ML_Class.AL_Encoder" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">JSONEncoder</span></code></p>
+<p>This class attempts to make the Active_ML_Model JSON serializable.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Active_ML_Model is not JSON serializable and thus this class does not work.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="app.ML_Class.AL_Encoder.default">
+<span class="sig-name descname"><span class="pre">default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">o</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/ML_Class.html#AL_Encoder.default"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.ML_Class.AL_Encoder.default" title="Link to this definition"></a></dt>
+<dd><p>Implement this method in a subclass such that it returns
+a serializable object for <code class="docutils literal notranslate"><span class="pre">o</span></code>, or calls the base implementation
+(to raise a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>).</p>
+<p>For example, to support arbitrary iterators, you could
+implement default like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">iterable</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+    <span class="c1"># Let the base class default method raise the TypeError</span>
+    <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="app.ML_Class.Active_ML_Model">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.ML_Class.</span></span><span class="sig-name descname"><span class="pre">Active_ML_Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ml_classifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preprocess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/ML_Class.html#Active_ML_Model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.ML_Class.Active_ML_Model" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class creates an active learning model based on the data sent,
+data preprocessing, and type of ml classifier.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="app.ML_Class.Active_ML_Model.Continue">
+<span class="sig-name descname"><span class="pre">Continue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sampling_method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/ML_Class.html#Active_ML_Model.Continue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.ML_Class.Active_ML_Model.Continue" title="Link to this definition"></a></dt>
+<dd><p>This function continues the active learning model to the next step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sampling_method</strong> (<em>Python Function</em>) – Determines the next set of samples to send to user.</p></li>
+<li><p><strong>n_samples</strong> (<em>int</em>) – The number of samplest that should be added the the train set.</p></li>
+<li><p><strong>Updated</strong> (<em>Attributes</em>)</p></li>
+<li><p><strong>-------</strong></p></li>
+<li><p><strong>ml_classifier</strong> (<em>classifier object</em>) – The classifier to be used to create the active learning model.</p></li>
+<li><p><strong>test</strong> (<em>pandas DataFrame</em>) – The training set.</p></li>
+<li><p><strong>train</strong> (<em>pandas DataFrame</em>) – The train set.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="app.ML_Class.Active_ML_Model.Train">
+<span class="sig-name descname"><span class="pre">Train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/ML_Class.html#Active_ML_Model.Train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.ML_Class.Active_ML_Model.Train" title="Link to this definition"></a></dt>
+<dd><p>This function trains the innitial ml_model
+:param train: The training set with labels
+:type train: pandas DataFrame
+:param Attributes Added:
+:param —————-:
+:param ml_model: The machine learning model created using the training data.
+:type ml_model: fitted machine learning classifier</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="app.ML_Class.Active_ML_Model.infoForProgress">
+<span class="sig-name descname"><span class="pre">infoForProgress</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/ML_Class.html#Active_ML_Model.infoForProgress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.ML_Class.Active_ML_Model.infoForProgress" title="Link to this definition"></a></dt>
+<dd><p>This function returns the information nessessary to display the progress of the active learning model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>health_pic</strong> (<em>list</em>) – List of images that were predicted as healthy.</p></li>
+<li><p><strong>blight_pic</strong> (<em>list</em>) – List of images that were predicted as unhealthy.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="app.ML_Class.Active_ML_Model.infoForResults">
+<span class="sig-name descname"><span class="pre">infoForResults</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/ML_Class.html#Active_ML_Model.infoForResults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.ML_Class.Active_ML_Model.infoForResults" title="Link to this definition"></a></dt>
+<dd><p>This function returns the information nessessary to display the final results of the active learning model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>health_pic_user</strong> (<em>list</em>) – List of images that were predicted correctly.</p></li>
+<li><p><strong>blight_pic_user</strong> (<em>list</em>) – List of images that were predicted incorrectly.</p></li>
+<li><p><strong>health_pic</strong> (<em>list</em>) – List of images in the test set that are predicted to being healthy.</p></li>
+<li><p><strong>blight_pic</strong> (<em>list</em>) – List of images in the test set that are predicted to being blighted.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="app.ML_Class.ML_Model">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.ML_Class.</span></span><span class="sig-name descname"><span class="pre">ML_Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ml_classifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preprocess</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/ML_Class.html#ML_Model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.ML_Class.ML_Model" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class creates a machine learning model based on the data sent,
+data preprocessing, and type of ml classifier.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="app.ML_Class.ML_Model.GetKnownPredictions">
+<span class="sig-name descname"><span class="pre">GetKnownPredictions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/ML_Class.html#ML_Model.GetKnownPredictions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.ML_Class.ML_Model.GetKnownPredictions" title="Link to this definition"></a></dt>
+<dd><p>This function predicts the labels for a new set of data that contains labels.
+It returns these predictions and the probability.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>new_data</strong> (<em>pandas DataFrame</em>) – The new data to be labeled.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>y_prediction</strong> (<em>list</em>) – list of predicted labels.</p></li>
+<li><p><strong>prob</strong> (<em>list</em>) – The probability that the label is correct.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="app.ML_Class.ML_Model.GetUnknownPredictions">
+<span class="sig-name descname"><span class="pre">GetUnknownPredictions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_data_X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/ML_Class.html#ML_Model.GetUnknownPredictions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.ML_Class.ML_Model.GetUnknownPredictions" title="Link to this definition"></a></dt>
+<dd><p>This function predicts the labels for a new set of data that does not contains labels.
+It returns these predictions and the probability.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>new_data</strong> (<em>pandas DataFrame</em>) – The new data to be labeled.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>y_prediction</strong> (<em>list</em>) – list of predicted labels.</p></li>
+<li><p><strong>prob</strong> (<em>list</em>) – The probability that the label is correct.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="app.ML_Class.ML_Model.K_fold">
+<span class="sig-name descname"><span class="pre">K_fold</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/ML_Class.html#ML_Model.K_fold"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.ML_Class.ML_Model.K_fold" title="Link to this definition"></a></dt>
+<dd><p>This function performs a 10-fold cross-validation and returns the accuracies of each fold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>accuracies</strong> – The 10 accuracy values using 10-fold cross-validation.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="app.ML_Class.ML_Model.infoForProgress">
+<span class="sig-name descname"><span class="pre">infoForProgress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train_img_names</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/ML_Class.html#ML_Model.infoForProgress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.ML_Class.ML_Model.infoForProgress" title="Link to this definition"></a></dt>
+<dd><p>This function returns the information nessessary to display the progress of the active learning model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>train_img_names</strong> (<em>list</em>) – list of image names in the training set.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>health_pic</strong> (<em>list</em>) – List of images that were predicted as healthy.</p></li>
+<li><p><strong>blight_pic</strong> (<em>list</em>) – List of images that were predicted as unhealthy.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="app.ML_Class.ML_Model.infoForResults">
+<span class="sig-name descname"><span class="pre">infoForResults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train_img_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/ML_Class.html#ML_Model.infoForResults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.ML_Class.ML_Model.infoForResults" title="Link to this definition"></a></dt>
+<dd><p>This function returns the information nessessary to display the final results of the active learning model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>train_img_names</strong> (<em>list</em>) – list of image names in the training set.</p></li>
+<li><p><strong>test</strong> (<em>pandas dataframe</em>) – The test set of the machine learning model.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>health_pic_user</strong> (<em>list</em>) – List of images that were predicted as healthy.</p></li>
+<li><p><strong>blight_pic_user</strong> (<em>list</em>) – List of images that were predicted as blight.</p></li>
+<li><p><strong>health_pic</strong> (<em>list</em>) – List of images in the test set that are predicted to being healthy.</p></li>
+<li><p><strong>blight_pic</strong> (<em>list</em>) – List of images in the test set that are predicted to being blighted.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-app.SamplingMethods">
+<span id="app-samplingmethods-module"></span><h2>app.SamplingMethods module<a class="headerlink" href="#module-app.SamplingMethods" title="Link to this heading"></a></h2>
+<p>Created on Tue Mar 10 10:48:17 2020</p>
+<p>&#64;author: Donovan</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.SamplingMethods.lowestPercentage">
+<span class="sig-prename descclassname"><span class="pre">app.SamplingMethods.</span></span><span class="sig-name descname"><span class="pre">lowestPercentage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ml_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X_test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/SamplingMethods.html#lowestPercentage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.SamplingMethods.lowestPercentage" title="Link to this definition"></a></dt>
+<dd><p>This sampling method finds the pictures with the lowest percent probability in the test set.
+It then removes the n samples with the lowest percent probability from X_test.
+Finaly it returns the new testing set and the sample set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>al_model</strong> (<em>active learning class object</em>) – The active learning model.</p></li>
+<li><p><strong>n</strong> (<em>int</em>) – The number of samples to be returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>X_sample</strong> (<em>pandas DataFrame</em>) – The new list of samples to be added to the train set.</p></li>
+<li><p><strong>X_test</strong> (<em>pandas DataFrame</em>) – The new testing set with the samples removed.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-app.forms">
+<span id="app-forms-module"></span><h2>app.forms module<a class="headerlink" href="#module-app.forms" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="app.forms.LabelForm">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.forms.</span></span><span class="sig-name descname"><span class="pre">LabelForm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/forms.html#LabelForm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.forms.LabelForm" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">FlaskForm</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.forms.LabelForm.choice">
+<span class="sig-name descname"><span class="pre">choice</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;UnboundField(RadioField,</span> <span class="pre">('Label',),</span> <span class="pre">{'choices':</span> <span class="pre">[('H',</span> <span class="pre">'Healthy'),</span> <span class="pre">('B',</span> <span class="pre">'Unhealthy')],</span> <span class="pre">'validators':</span> <span class="pre">[&lt;wtforms.validators.DataRequired</span> <span class="pre">object&gt;]})&gt;</span></em><a class="headerlink" href="#app.forms.LabelForm.choice" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.forms.LabelForm.submit">
+<span class="sig-name descname"><span class="pre">submit</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;UnboundField(SubmitField,</span> <span class="pre">('Add</span> <span class="pre">Label',),</span> <span class="pre">{})&gt;</span></em><a class="headerlink" href="#app.forms.LabelForm.submit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-app.models">
+<span id="app-models-module"></span><h2>app.models module<a class="headerlink" href="#module-app.models" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="app.models.Image">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.models.</span></span><span class="sig-name descname"><span class="pre">Image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/models.html#Image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.models.Image" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.Image.filename">
+<span class="sig-name descname"><span class="pre">filename</span></span><a class="headerlink" href="#app.models.Image.filename" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.Image.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#app.models.Image.id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.Image.label">
+<span class="sig-name descname"><span class="pre">label</span></span><a class="headerlink" href="#app.models.Image.label" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.Image.query">
+<span class="sig-name descname"><span class="pre">query</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">t.ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Query</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#app.models.Image.query" title="Link to this definition"></a></dt>
+<dd><p>A SQLAlchemy query for a model. Equivalent to <code class="docutils literal notranslate"><span class="pre">db.session.query(Model)</span></code>. Can be
+customized per-model by overriding <code class="xref py py-attr docutils literal notranslate"><span class="pre">query_class</span></code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The query interface is considered legacy in SQLAlchemy. Prefer using
+<code class="docutils literal notranslate"><span class="pre">session.execute(select())</span></code> instead.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.Image.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><a class="headerlink" href="#app.models.Image.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="app.models.Label">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.models.</span></span><span class="sig-name descname"><span class="pre">Label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/models.html#Label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.models.Label" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.Label.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#app.models.Label.id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.Label.image_id">
+<span class="sig-name descname"><span class="pre">image_id</span></span><a class="headerlink" href="#app.models.Label.image_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.Label.query">
+<span class="sig-name descname"><span class="pre">query</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">t.ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Query</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#app.models.Label.query" title="Link to this definition"></a></dt>
+<dd><p>A SQLAlchemy query for a model. Equivalent to <code class="docutils literal notranslate"><span class="pre">db.session.query(Model)</span></code>. Can be
+customized per-model by overriding <code class="xref py py-attr docutils literal notranslate"><span class="pre">query_class</span></code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The query interface is considered legacy in SQLAlchemy. Prefer using
+<code class="docutils literal notranslate"><span class="pre">session.execute(select())</span></code> instead.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.Label.text">
+<span class="sig-name descname"><span class="pre">text</span></span><a class="headerlink" href="#app.models.Label.text" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.Label.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><a class="headerlink" href="#app.models.Label.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="app.models.User">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.models.</span></span><span class="sig-name descname"><span class="pre">User</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/models.html#User"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.models.User" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">UserMixin</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="app.models.User.check_password">
+<span class="sig-name descname"><span class="pre">check_password</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">password</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/models.html#User.check_password"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.models.User.check_password" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.User.email">
+<span class="sig-name descname"><span class="pre">email</span></span><a class="headerlink" href="#app.models.User.email" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.User.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#app.models.User.id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.User.images">
+<span class="sig-name descname"><span class="pre">images</span></span><a class="headerlink" href="#app.models.User.images" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.User.labels">
+<span class="sig-name descname"><span class="pre">labels</span></span><a class="headerlink" href="#app.models.User.labels" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.User.password">
+<span class="sig-name descname"><span class="pre">password</span></span><a class="headerlink" href="#app.models.User.password" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.User.query">
+<span class="sig-name descname"><span class="pre">query</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">t.ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Query</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#app.models.User.query" title="Link to this definition"></a></dt>
+<dd><p>A SQLAlchemy query for a model. Equivalent to <code class="docutils literal notranslate"><span class="pre">db.session.query(Model)</span></code>. Can be
+customized per-model by overriding <code class="xref py py-attr docutils literal notranslate"><span class="pre">query_class</span></code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The query interface is considered legacy in SQLAlchemy. Prefer using
+<code class="docutils literal notranslate"><span class="pre">session.execute(select())</span></code> instead.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="app.models.User.set_password">
+<span class="sig-name descname"><span class="pre">set_password</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">password</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/models.html#User.set_password"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.models.User.set_password" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-app.web">
+<span id="app-web-module"></span><h2>app.web module<a class="headerlink" href="#module-app.web" title="Link to this heading"></a></h2>
+<p>&#64;package web
+This method is responsible for the inner workings of the different web pages in this application.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.web.createMLModel">
+<span class="sig-prename descclassname"><span class="pre">app.web.</span></span><span class="sig-name descname"><span class="pre">createMLModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/web.html#createMLModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.web.createMLModel" title="Link to this definition"></a></dt>
+<dd><p>Prepares the training set and creates a machine learning model using the training set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>Pandas DataFrame</em>) – The data that contains the features for each image</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>ml_model</strong> (<em>ML_Model class object</em>) – ml_model created from the training set.</p></li>
+<li><p><strong>train_img_names</strong> (<em>String</em>) – The names of the images.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.web.feedback">
+<span class="sig-prename descclassname"><span class="pre">app.web.</span></span><span class="sig-name descname"><span class="pre">feedback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h_conf_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_conf_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/web.html#feedback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.web.feedback" title="Link to this definition"></a></dt>
+<dd><p>Operates the feedback(feedback.html) web page.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.web.final">
+<span class="sig-prename descclassname"><span class="pre">app.web.</span></span><span class="sig-name descname"><span class="pre">final</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/web.html#final"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.web.final" title="Link to this definition"></a></dt>
+<dd><p>Operates the final(final.html) web page.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.web.getData">
+<span class="sig-prename descclassname"><span class="pre">app.web.</span></span><span class="sig-name descname"><span class="pre">getData</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/web.html#getData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.web.getData" title="Link to this definition"></a></dt>
+<dd><p>Gets and returns the csvOut.csv as a DataFrame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> – The data that contains the features for each image.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Pandas DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.web.getNextSetOfImages">
+<span class="sig-prename descclassname"><span class="pre">app.web.</span></span><span class="sig-name descname"><span class="pre">getNextSetOfImages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_method</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/web.html#getNextSetOfImages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.web.getNextSetOfImages" title="Link to this definition"></a></dt>
+<dd><p>Uses a sampling method to get the next set of images needed to be labeled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>form</strong> (<em>LabelForm class object</em>) – form to be used when displaying label.html</p></li>
+<li><p><strong>sampling_method</strong> (<em>SamplingMethods Function</em>) – function that returns the queue and the new test set that does not contain the queue.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>render_template</strong> – renders the label.html webpage.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>flask function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.web.get_user_by_email">
+<span class="sig-prename descclassname"><span class="pre">app.web.</span></span><span class="sig-name descname"><span class="pre">get_user_by_email</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">email</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/web.html#get_user_by_email"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.web.get_user_by_email" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.web.home">
+<span class="sig-prename descclassname"><span class="pre">app.web.</span></span><span class="sig-name descname"><span class="pre">home</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/web.html#home"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.web.home" title="Link to this definition"></a></dt>
+<dd><p>Redirects users based on login status:
+- If logged in, redirect to label.html
+- If not logged in, redirect to index.html</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.web.initializeAL">
+<span class="sig-prename descclassname"><span class="pre">app.web.</span></span><span class="sig-name descname"><span class="pre">initializeAL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">confidence_break</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/web.html#initializeAL"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.web.initializeAL" title="Link to this definition"></a></dt>
+<dd><p>Initializes the active learning model and sets up the webpage with everything needed to run the application.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>form</strong> (<em>LabelForm class object</em>) – form to be used when displaying label.html</p></li>
+<li><p><strong>confidence_break</strong> (<em>number</em>) – How confident the model is.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>render_template</strong> – renders the label.html webpage.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>flask function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.web.intermediate">
+<span class="sig-prename descclassname"><span class="pre">app.web.</span></span><span class="sig-name descname"><span class="pre">intermediate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/web.html#intermediate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.web.intermediate" title="Link to this definition"></a></dt>
+<dd><p>Operates the intermediate(intermediate.html) web page.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.web.label">
+<span class="sig-prename descclassname"><span class="pre">app.web.</span></span><span class="sig-name descname"><span class="pre">label</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/web.html#label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.web.label" title="Link to this definition"></a></dt>
+<dd><p>Operates the label(label.html) web page.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.web.load_user">
+<span class="sig-prename descclassname"><span class="pre">app.web.</span></span><span class="sig-name descname"><span class="pre">load_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/web.html#load_user"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.web.load_user" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.web.login">
+<span class="sig-prename descclassname"><span class="pre">app.web.</span></span><span class="sig-name descname"><span class="pre">login</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/web.html#login"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.web.login" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.web.logout">
+<span class="sig-prename descclassname"><span class="pre">app.web.</span></span><span class="sig-name descname"><span class="pre">logout</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/web.html#logout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.web.logout" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.web.prepairResults">
+<span class="sig-prename descclassname"><span class="pre">app.web.</span></span><span class="sig-name descname"><span class="pre">prepairResults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/web.html#prepairResults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.web.prepairResults" title="Link to this definition"></a></dt>
+<dd><p>Creates the new machine learning model and gets the confidence of the machine learning model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>form</strong> (<em>LabelForm class object</em>) – form to be used when displaying label.html</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>render_template</strong> – renders the appropriate webpage based on new confidence score.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>flask function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.web.profile">
+<span class="sig-prename descclassname"><span class="pre">app.web.</span></span><span class="sig-name descname"><span class="pre">profile</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/web.html#profile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.web.profile" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.web.register">
+<span class="sig-prename descclassname"><span class="pre">app.web.</span></span><span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/web.html#register"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.web.register" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.web.renderLabel">
+<span class="sig-prename descclassname"><span class="pre">app.web.</span></span><span class="sig-name descname"><span class="pre">renderLabel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/web.html#renderLabel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.web.renderLabel" title="Link to this definition"></a></dt>
+<dd><p>Prepares a render_template to show the label.html web page.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>form</strong> (<em>LabelForm class object</em>) – form to be used when displaying label.html</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>render_template</strong> – renders the label.html webpage.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>flask function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.web.saved">
+<span class="sig-prename descclassname"><span class="pre">app.web.</span></span><span class="sig-name descname"><span class="pre">saved</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/web.html#saved"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.web.saved" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-app">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-app" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="agro-ai" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="config.html" class="btn btn-neutral float-right" title="config module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Team 16.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
