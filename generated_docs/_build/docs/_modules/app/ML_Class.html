@@ -1,0 +1,542 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>app.ML_Class &mdash; agro-ai 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            agro-ai
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">agro-ai</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">agro-ai</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">app.ML_Class</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for app.ML_Class</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Thu Feb  6 12:54:45 2020</span>
+<span class="sd">@author: Donovan</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">json</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONEncoder</span>
+
+<div class="viewcode-block" id="ML_Model">
+<a class="viewcode-back" href="../../app.html#app.ML_Class.ML_Model">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ML_Model</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class creates a machine learning model based on the data sent,</span>
+<span class="sd">    data preprocessing, and type of ml classifier.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_data</span><span class="p">,</span> <span class="n">ml_classifier</span><span class="p">,</span> <span class="n">preprocess</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function controls the initial creation of the machine learning model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        train_data : pandas DataFrame</span>
+<span class="sd">            The data the machine learning model will be built on.</span>
+<span class="sd">        ml_classifier : classifier object</span>
+<span class="sd">            The classifier to be used to create the machine learning model.</span>
+<span class="sd">        preprocess : Python Function</span>
+<span class="sd">            The function used to preprocess the data before model creation.</span>
+
+<span class="sd">        Attributes</span>
+<span class="sd">        -------</span>
+<span class="sd">        ml_classifier : classifier object</span>
+<span class="sd">            The classifier to be used to create the machine learning model.</span>
+<span class="sd">        preprocess : Python Function</span>
+<span class="sd">            The function used to preprocess the data before model creation.</span>
+<span class="sd">        X : pandas DataFrame</span>
+<span class="sd">            The features in the train set.</span>
+<span class="sd">        y : pandas Series</span>
+<span class="sd">            The responce variable.</span>
+<span class="sd">        ml_model : fitted machine learning classifier</span>
+<span class="sd">            The machine learning model created using the training data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ml_classifier</span> <span class="o">=</span> <span class="n">ml_classifier</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preprocess</span> <span class="o">=</span> <span class="n">preprocess</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">train_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,:</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">train_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ml_model</span> <span class="o">=</span> <span class="n">ml_classifier</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ML_Model.GetKnownPredictions">
+<a class="viewcode-back" href="../../app.html#app.ML_Class.ML_Model.GetKnownPredictions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">GetKnownPredictions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function predicts the labels for a new set of data that contains labels.</span>
+<span class="sd">        It returns these predictions and the probability.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        new_data : pandas DataFrame</span>
+<span class="sd">            The new data to be labeled.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        y_prediction : list</span>
+<span class="sd">            list of predicted labels.</span>
+<span class="sd">        prob : list</span>
+<span class="sd">            The probability that the label is correct.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_data_X</span> <span class="o">=</span> <span class="n">new_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">new_data_X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">new_data_X</span><span class="p">)</span>
+        <span class="n">y_prediction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ml_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">new_data_X</span><span class="p">)</span>
+        <span class="n">y_probabilities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ml_model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">new_data_X</span><span class="p">)</span>
+        <span class="n">y_probabilities</span> <span class="o">=</span> <span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span> <span class="k">for</span> <span class="n">prob</span> <span class="ow">in</span> <span class="n">y_probabilities</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">y_prediction</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">y_probabilities</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ML_Model.GetUnknownPredictions">
+<a class="viewcode-back" href="../../app.html#app.ML_Class.ML_Model.GetUnknownPredictions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">GetUnknownPredictions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_data_X</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function predicts the labels for a new set of data that does not contains labels.</span>
+<span class="sd">        It returns these predictions and the probability.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        new_data : pandas DataFrame</span>
+<span class="sd">            The new data to be labeled.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        y_prediction : list</span>
+<span class="sd">            list of predicted labels.</span>
+<span class="sd">        prob : list</span>
+<span class="sd">            The probability that the label is correct.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_data_X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">new_data_X</span><span class="p">)</span>
+        <span class="n">y_prediction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ml_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">new_data_X</span><span class="p">)</span>
+        <span class="n">y_probabilities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ml_model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">new_data_X</span><span class="p">)</span>
+        <span class="n">y_probabilities</span> <span class="o">=</span> <span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span> <span class="k">for</span> <span class="n">prob</span> <span class="ow">in</span> <span class="n">y_probabilities</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">y_prediction</span><span class="p">,</span> <span class="n">y_probabilities</span></div>
+
+
+<div class="viewcode-block" id="ML_Model.K_fold">
+<a class="viewcode-back" href="../../app.html#app.ML_Class.ML_Model.K_fold">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">K_fold</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function performs a 10-fold cross-validation and returns the accuracies of each fold.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        accuracies : list</span>
+<span class="sd">            The 10 accuracy values using 10-fold cross-validation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">cross_val_score</span>
+        <span class="n">accuracies</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ml_classifier</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">accuracies</span></div>
+
+
+<div class="viewcode-block" id="ML_Model.infoForProgress">
+<a class="viewcode-back" href="../../app.html#app.ML_Class.ML_Model.infoForProgress">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">infoForProgress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_img_names</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function returns the information nessessary to display the progress of the active learning model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        train_img_names : list</span>
+<span class="sd">            list of image names in the training set.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        health_pic : list</span>
+<span class="sd">            List of images that were predicted as healthy.</span>
+
+<span class="sd">        blight_pic : list</span>
+<span class="sd">            List of images that were predicted as unhealthy.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">y_actual</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
+        <span class="n">y_pic</span> <span class="o">=</span> <span class="n">train_img_names</span>
+        <span class="c1">#y_pred = self.ml_model.predict(self.X)</span>
+        <span class="c1">#y_pred = list(y_pred)</span>
+        <span class="n">health_pic</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">blight_pic</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_pic</span><span class="p">)</span> <span class="o">==</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">y_pic</span> <span class="o">=</span> <span class="n">y_pic</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">y_idx</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">y_actual</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">y</span> <span class="o">==</span> <span class="s1">&#39;H&#39;</span><span class="p">:</span>
+                    <span class="n">health_pic</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_pic</span><span class="p">[</span><span class="n">y_idx</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="n">y</span> <span class="o">==</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span>
+                    <span class="n">blight_pic</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_pic</span><span class="p">[</span><span class="n">y_idx</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">y_pic_head</span> <span class="o">=</span> <span class="n">y_pic</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+            <span class="n">y_pic_head_rev</span> <span class="o">=</span> <span class="n">y_pic_head</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">y_pic_result</span> <span class="o">=</span> <span class="n">y_pic_head_rev</span>
+            <span class="n">y_pic_tail</span> <span class="o">=</span> <span class="n">y_pic</span><span class="p">[</span><span class="mi">10</span><span class="p">:]</span>
+            <span class="n">y_pic_tail_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_pic_tail</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="n">y_pic_tail_length</span> <span class="o">+</span> <span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">):</span>
+                <span class="n">y_pic_tail_rev</span> <span class="o">=</span> <span class="n">y_pic_tail</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
+                <span class="n">y_pic_tail_rev</span> <span class="o">=</span> <span class="n">y_pic_tail_rev</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">y_pic_result</span> <span class="o">=</span> <span class="n">y_pic_result</span> <span class="o">+</span> <span class="n">y_pic_tail_rev</span>
+                <span class="n">y_pic_tail</span> <span class="o">=</span> <span class="n">y_pic_tail</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span>
+            <span class="k">for</span> <span class="n">y_idx</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">y_actual</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">y</span> <span class="o">==</span> <span class="s1">&#39;H&#39;</span><span class="p">:</span>
+                    <span class="n">health_pic</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_pic_result</span><span class="p">[</span><span class="n">y_idx</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="n">y</span> <span class="o">==</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span>
+                    <span class="n">blight_pic</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_pic_result</span><span class="p">[</span><span class="n">y_idx</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">health_pic</span><span class="p">,</span> <span class="n">blight_pic</span></div>
+
+
+<div class="viewcode-block" id="ML_Model.infoForResults">
+<a class="viewcode-back" href="../../app.html#app.ML_Class.ML_Model.infoForResults">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">infoForResults</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_img_names</span><span class="p">,</span> <span class="n">test</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function returns the information nessessary to display the final results of the active learning model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        train_img_names : list</span>
+<span class="sd">            list of image names in the training set.</span>
+<span class="sd">        test : pandas dataframe</span>
+<span class="sd">            The test set of the machine learning model.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        health_pic_user : list</span>
+<span class="sd">            List of images that were predicted as healthy.</span>
+
+<span class="sd">        blight_pic_user : list</span>
+<span class="sd">            List of images that were predicted as blight.</span>
+
+<span class="sd">        health_pic : list</span>
+<span class="sd">            List of images in the test set that are predicted to being healthy.</span>
+
+<span class="sd">        blight_pic : list</span>
+<span class="sd">            List of images in the test set that are predicted to being blighted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">health_pic_user</span><span class="p">,</span> <span class="n">blight_pic_user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">infoForProgress</span><span class="p">(</span><span class="n">train_img_names</span><span class="p">)</span>
+        <span class="n">test_pic</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">test</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">y_pred</span><span class="p">,</span> <span class="n">y_prob</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetUnknownPredictions</span><span class="p">(</span><span class="n">test</span><span class="p">)</span>
+        <span class="n">health_pic</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">blight_pic</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">health_pic_prob</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">blight_pic_prob</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">y_idx</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">y_pred</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">y</span> <span class="o">==</span> <span class="s1">&#39;H&#39;</span><span class="p">:</span>
+                <span class="n">health_pic</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">test_pic</span><span class="p">[</span><span class="n">y_idx</span><span class="p">])</span>
+                <span class="n">health_pic_prob</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_prob</span><span class="p">[</span><span class="n">y_idx</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">y</span> <span class="o">==</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span>
+                <span class="n">blight_pic</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">test_pic</span><span class="p">[</span><span class="n">y_idx</span><span class="p">])</span>
+                <span class="n">blight_pic_prob</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_prob</span><span class="p">[</span><span class="n">y_idx</span><span class="p">])</span>
+        <span class="n">health_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">health_pic</span><span class="p">,</span><span class="n">health_pic_prob</span><span class="p">))</span>
+        <span class="n">blight_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">blight_pic</span><span class="p">,</span><span class="n">blight_pic_prob</span><span class="p">))</span>
+        <span class="n">health_list_sorted</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">health_list</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">blight_list_sorted</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">blight_list</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">health_pic</span> <span class="ow">and</span> <span class="n">health_pic_prob</span><span class="p">:</span>
+            <span class="n">new_health_pic</span><span class="p">,</span> <span class="n">new_health_pic_prob</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">health_list_sorted</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_health_pic</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">new_health_pic_prob</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">blight_pic</span> <span class="ow">and</span> <span class="n">blight_pic_prob</span><span class="p">:</span>
+            <span class="n">new_blight_pic</span><span class="p">,</span> <span class="n">new_blight_pic_prob</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">blight_list_sorted</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_blight_pic</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">new_blight_pic_prob</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">return</span> <span class="n">health_pic_user</span><span class="p">,</span> <span class="n">blight_pic_user</span><span class="p">,</span> <span class="n">new_health_pic</span><span class="p">,</span> <span class="n">new_blight_pic</span><span class="p">,</span> <span class="n">new_health_pic_prob</span><span class="p">,</span> <span class="n">new_blight_pic_prob</span></div>
+</div>
+
+
+<div class="viewcode-block" id="Active_ML_Model">
+<a class="viewcode-back" href="../../app.html#app.ML_Class.Active_ML_Model">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Active_ML_Model</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class creates an active learning model based on the data sent,</span>
+<span class="sd">    data preprocessing, and type of ml classifier.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ml_classifier</span><span class="p">,</span> <span class="n">preprocess</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function controls the initial creation of the active learning model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : pandas DataFrame</span>
+<span class="sd">            The data the active learning model will be built on.</span>
+<span class="sd">        ml_classifier : classifier object</span>
+<span class="sd">            The classifier to be used to create the machine learning model.</span>
+<span class="sd">        preprocess : Python Function</span>
+<span class="sd">            The function used to preprocess the data before model creation.</span>
+<span class="sd">        n_samples : int</span>
+<span class="sd">            The number of random samples to be used in the initial model creation.</span>
+
+<span class="sd">        Attributes</span>
+<span class="sd">        -------</span>
+<span class="sd">        ml_classifier : classifier object</span>
+<span class="sd">            The classifier to be used to create the active learning model.</span>
+<span class="sd">        preprocess : Python Function</span>
+<span class="sd">            The function used to preprocess the data before model creation.</span>
+<span class="sd">        test : pandas DataFrame</span>
+<span class="sd">            The training set.</span>
+<span class="sd">        train : pandas DataFrame</span>
+<span class="sd">            The train set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">shuffle</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">shuffle</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="n">n_samples</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">n_samples</span><span class="p">:,</span> <span class="p">:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ml_classifier</span> <span class="o">=</span> <span class="n">ml_classifier</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preprocess</span> <span class="o">=</span> <span class="n">preprocess</span>
+
+<div class="viewcode-block" id="Active_ML_Model.Train">
+<a class="viewcode-back" href="../../app.html#app.ML_Class.Active_ML_Model.Train">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function trains the innitial ml_model</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        train : pandas DataFrame</span>
+<span class="sd">            The training set with labels</span>
+
+<span class="sd">        Attributes Added</span>
+<span class="sd">        ----------------</span>
+<span class="sd">        ml_model : fitted machine learning classifier</span>
+<span class="sd">            The machine learning model created using the training data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">train</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">train</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">train</span><span class="p">,</span> <span class="n">sample</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">train</span> <span class="o">=</span> <span class="n">sample</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ml_model</span> <span class="o">=</span> <span class="n">ML_Model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ml_classifier</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Active_ML_Model.Continue">
+<a class="viewcode-back" href="../../app.html#app.ML_Class.Active_ML_Model.Continue">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Continue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampling_method</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">5</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function continues the active learning model to the next step.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sampling_method : Python Function</span>
+<span class="sd">            Determines the next set of samples to send to user.</span>
+<span class="sd">        n_samples : int</span>
+<span class="sd">            The number of samplest that should be added the the train set.</span>
+
+<span class="sd">        Attributes Updated</span>
+<span class="sd">        -------</span>
+<span class="sd">        ml_classifier : classifier object</span>
+<span class="sd">            The classifier to be used to create the active learning model.</span>
+<span class="sd">        test : pandas DataFrame</span>
+<span class="sd">            The training set.</span>
+<span class="sd">        train : pandas DataFrame</span>
+<span class="sd">            The train set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test</span> <span class="o">=</span> <span class="n">sampling_method</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ml_model</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Active_ML_Model.infoForProgress">
+<a class="viewcode-back" href="../../app.html#app.ML_Class.Active_ML_Model.infoForProgress">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">infoForProgress</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function returns the information nessessary to display the progress of the active learning model.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        health_pic : list</span>
+<span class="sd">            List of images that were predicted as healthy.</span>
+
+<span class="sd">        blight_pic : list</span>
+<span class="sd">            List of images that were predicted as unhealthy.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">y_actual</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ml_model</span><span class="o">.</span><span class="n">train</span><span class="p">[</span><span class="s1">&#39;y_value&#39;</span><span class="p">]</span>
+        <span class="n">y_pic</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ml_model</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="c1">#y_pred, y_prob = self.ml_model.GetKnownPredictions(self.ml_model.train)</span>
+        <span class="c1">#y_pred = list(y_pred)</span>
+        <span class="n">health_pic</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">blight_pic</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_pic</span><span class="p">)</span> <span class="o">==</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">y_pic</span> <span class="o">=</span> <span class="n">y_pic</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">y_idx</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">y_actual</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">y</span> <span class="o">==</span> <span class="s1">&#39;H&#39;</span><span class="p">:</span>
+                    <span class="n">health_pic</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_pic</span><span class="p">[</span><span class="n">y_idx</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="n">y</span> <span class="o">==</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span>
+                    <span class="n">blight_pic</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_pic</span><span class="p">[</span><span class="n">y_idx</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">y_pic_head</span> <span class="o">=</span> <span class="n">y_pic</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+            <span class="n">y_pic_head_rev</span> <span class="o">=</span> <span class="n">y_pic_head</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">y_pic_result</span> <span class="o">=</span> <span class="n">y_pic_head_rev</span>
+            <span class="n">y_pic_tail</span> <span class="o">=</span> <span class="n">y_pic</span><span class="p">[</span><span class="mi">10</span><span class="p">:]</span>
+            <span class="n">y_pic_tail_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_pic_tail</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="n">y_pic_tail_length</span> <span class="o">+</span> <span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">):</span>
+                <span class="n">y_pic_tail_rev</span> <span class="o">=</span> <span class="n">y_pic_tail</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
+                <span class="n">y_pic_tail_rev</span> <span class="o">=</span> <span class="n">y_pic_tail_rev</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">y_pic_result</span> <span class="o">=</span> <span class="n">y_pic_result</span> <span class="o">+</span> <span class="n">y_pic_tail_rev</span>
+                <span class="n">y_pic_tail</span> <span class="o">=</span> <span class="n">y_pic_tail</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span>
+            <span class="k">for</span> <span class="n">y_idx</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">y_actual</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">y</span> <span class="o">==</span> <span class="s1">&#39;H&#39;</span><span class="p">:</span>
+                    <span class="n">health_pic</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_pic_result</span><span class="p">[</span><span class="n">y_idx</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="n">y</span> <span class="o">==</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span>
+                    <span class="n">blight_pic</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_pic_result</span><span class="p">[</span><span class="n">y_idx</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">health_pic</span><span class="p">,</span> <span class="n">blight_pic</span></div>
+
+
+<div class="viewcode-block" id="Active_ML_Model.infoForResults">
+<a class="viewcode-back" href="../../app.html#app.ML_Class.Active_ML_Model.infoForResults">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">infoForResults</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function returns the information nessessary to display the final results of the active learning model.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        health_pic_user : list</span>
+<span class="sd">            List of images that were predicted correctly.</span>
+
+<span class="sd">        blight_pic_user : list</span>
+<span class="sd">            List of images that were predicted incorrectly.</span>
+
+<span class="sd">        health_pic : list</span>
+<span class="sd">            List of images in the test set that are predicted to being healthy.</span>
+
+<span class="sd">        blight_pic : list</span>
+<span class="sd">            List of images in the test set that are predicted to being blighted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">health_pic_user</span><span class="p">,</span> <span class="n">blight_pic_user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">infoForProgress</span><span class="p">()</span>
+        <span class="n">test_pic</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ml_model</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">idx</span><span class="p">)</span>
+        <span class="n">y_pred</span><span class="p">,</span> <span class="n">y_prob</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ml_model</span><span class="o">.</span><span class="n">GetUnknownPredictions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ml_model</span><span class="o">.</span><span class="n">test</span><span class="p">)</span>
+        <span class="n">health_pic</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">blight_pic</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">health_pic_prob</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">blight_pic_prob</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">y_idx</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">y_pred</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">y</span> <span class="o">==</span> <span class="s1">&#39;H&#39;</span><span class="p">:</span>
+                <span class="n">health_pic</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">test_pic</span><span class="p">[</span><span class="n">y_idx</span><span class="p">])</span>
+                <span class="n">health_pic_prob</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_prob</span><span class="p">[</span><span class="n">y_idx</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">y</span> <span class="o">==</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span>
+                <span class="n">blight_pic</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">test_pic</span><span class="p">[</span><span class="n">y_idx</span><span class="p">])</span>
+                <span class="n">blight_pic_prob</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_prob</span><span class="p">[</span><span class="n">y_idx</span><span class="p">])</span>
+        <span class="n">health_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">health_pic</span><span class="p">,</span><span class="n">health_pic_prob</span><span class="p">))</span>
+        <span class="n">blight_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">blight_pic</span><span class="p">,</span><span class="n">blight_pic_prob</span><span class="p">))</span>
+        <span class="n">health_list_sorted</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">health_list</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">blight_list_sorted</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">blight_list</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">new_health_pic</span><span class="p">,</span> <span class="n">new_health_pic_prob</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">health_list_sorted</span><span class="p">))</span>
+        <span class="n">new_blight_pic</span><span class="p">,</span> <span class="n">new_blight_pic_prob</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">blight_list_sorted</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">health_pic</span> <span class="ow">and</span> <span class="n">health_pic_prob</span><span class="p">:</span>
+            <span class="n">new_health_pic</span><span class="p">,</span> <span class="n">new_health_pic_prob</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">health_list_sorted</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_health_pic</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">new_health_pic_prob</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">blight_pic</span> <span class="ow">and</span> <span class="n">blight_pic_prob</span><span class="p">:</span>
+            <span class="n">new_blight_pic</span><span class="p">,</span> <span class="n">new_blight_pic_prob</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">blight_list_sorted</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_blight_pic</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">new_blight_pic_prob</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">return</span> <span class="n">health_pic_user</span><span class="p">,</span> <span class="n">blight_pic_user</span><span class="p">,</span> <span class="n">new_health_pic</span><span class="p">,</span> <span class="n">new_blight_pic</span><span class="p">,</span> <span class="n">new_health_pic_prob</span><span class="p">,</span> <span class="n">new_blight_pic_prob</span></div>
+</div>
+
+
+<div class="viewcode-block" id="AL_Encoder">
+<a class="viewcode-back" href="../../app.html#app.ML_Class.AL_Encoder">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AL_Encoder</span><span class="p">(</span><span class="n">JSONEncoder</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class attempts to make the Active_ML_Model JSON serializable.</span>
+
+<span class="sd">    Warning</span>
+<span class="sd">    -------</span>
+<span class="sd">    Active_ML_Model is not JSON serializable and thus this class does not work.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="AL_Encoder.default">
+<a class="viewcode-back" href="../../app.html#app.ML_Class.AL_Encoder.default">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">o</span><span class="o">.</span><span class="vm">__dict__</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Team 16.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
