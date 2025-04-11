@@ -170,22 +170,27 @@ def prepairResults(form):
     # Retrieve user_id from the logged-in user (current_user)
     user_id = current_user.id
     
+    # Prepare training data
+    if session['train'] is not None:
+        session['train'] = session['train'] + session['sample']
+    else:
+        session['train'] = session['sample']
+    
+    data = getData()
+    ml_model, train_img_names = createMLModel(data)
+    
+    # Get confidence before inserting labels
+    session['confidence'] = float(np.mean(ml_model.K_fold()))
+    confidence_score = session['confidence']
+    
     #loops through session['session'] and adds the image and label to the database
     for filename, label in session['sample']:
         new_image = Image(filename=filename, user_id=user_id, label=label)
         db.session.add(new_image)
         db.session.commit()
-        new_label = Label(text=label, image_id=new_image.id, user_id=user_id, confidence=0.0)
+        new_label = Label(text=label, image_id=new_image.id, user_id=user_id, confidence=confidence_score)
         db.session.add(new_label)
         db.session.commit()
-        
-    if session['train'] != None:
-        session['train'] = session['train'] + session['sample']
-    else:
-        session['train'] = session['sample']
-
-    data = getData()
-    ml_model, train_img_names = createMLModel(data)
     
     session['confidence'] = np.mean(ml_model.K_fold())
     session['labels'] = []
