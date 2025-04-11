@@ -27,4 +27,4 @@ class Label(db.Model):
     text = db.Column(db.String(255), nullable=False)
     image_id = db.Column(db.Integer, db.ForeignKey('image.id'), nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-
+    confidence = db.Column(db.Float, default=0.0)

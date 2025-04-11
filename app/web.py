@@ -175,7 +175,7 @@ def prepairResults(form):
         new_image = Image(filename=filename, user_id=user_id, label=label)
         db.session.add(new_image)
         db.session.commit()
-        new_label = Label(text=label, image_id=new_image.id, user_id=user_id)
+        new_label = Label(text=label, image_id=new_image.id, user_id=user_id, confidence=0.0)
         db.session.add(new_label)
         db.session.commit()
         
@@ -186,7 +186,7 @@ def prepairResults(form):
 
     data = getData()
     ml_model, train_img_names = createMLModel(data)
-
+    
     session['confidence'] = np.mean(ml_model.K_fold())
     session['labels'] = []
 
