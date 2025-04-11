@@ -10,7 +10,16 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="confidence-display mr-3">
+                <i class="fas fa-chart-line"></i>
+                Confidence: <strong>{{ "%.1f"|format(confidence * 100) }}%</strong>
+            </div>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
             <ul class="navbar-nav ml-auto">
+                
                 <li class="nav-item">
                     <a class="nav-link" href="/label.html">Train</a>
                 </li>
@@ -47,10 +56,12 @@
                         </p>
                         <br>
                         <p>&#10146; Use the buttons to label an image as "Healthy" or "Unhealthy"</p>
-                        <form class="form form-horizontal" action="" method="post">
-                            <p>{{form.choice()}}</p>
-                            <p>{{form.submit()}}</p>
-                        </form><br>
+                        <form method="POST">
+                            {{ form.hidden_tag() }}
+                            <p>{{ form.choice.label }}</p>
+                            <p>{{ form.choice() }}</p>
+                            <p>{{ form.submit() }}</p>
+                        </form>                        
                     </div>
                 </div>
             </div>

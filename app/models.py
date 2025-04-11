@@ -19,12 +19,12 @@ class User(db.Model, UserMixin):
 class Image(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     filename = db.Column(db.String(255), nullable=False)
-    upload_date = db.Column(db.DateTime, default=db.func.current_timestamp())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    label = db.Column(db.String(1), nullable=False)
 
 class Label(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(255), nullable=False)
     image_id = db.Column(db.Integer, db.ForeignKey('image.id'), nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-
+    confidence = db.Column(db.Float, default=0.0)
