@@ -38,28 +38,35 @@
     </nav>
 </body>
 
-<div class="container">
-    <h5 class="font-weight-light mt-4 mb-0">User's Healthy Plants: {{ healthy_count }}</h5>
-    <hr class="mt-2 mb-5">
-    <div class="row text-center text-lg-left">
-        {% for plant in healthy_plants %}
-        <div class="col-lg-3 col-md-4 col-6 d-block mb-4 h-100">
-            <img class="img-fluid img-rounded" src="{{ plant.image_url }}" alt="{{ plant.name }}">
-            <h6 class="font-weight-normal">{{ plant.name }}</h6>
-        </div>
-        {% endfor %}
-    </div>
+<div class="container mt-4">
+    <h3 class="font-weight-light">Labeling Accuracy</h3>
+    <hr>
+    <p>Your current accuracy: <strong>{{ accuracy }}%</strong></p>
 
-    <h5 class="font-weight-light mt-4 mb-0">User's Unhealthy Plants: {{ unhealthy_count }}</h5>
-    <hr class="mt-2 mb-5">
-    <div class="row text-center text-lg-left">
-        {% for plant in unhealthy_plants %}
-        <div class="col-lg-3 col-md-4 col-6 d-block mb-4 h-100">
-            <img class="img-fluid img-rounded" src="{{ plant.image_url }}" alt="{{ plant.name }}">
-            <h6 class="font-weight-normal">{{ plant.name }}</h6>
+    {% if total > 0 %}
+    <p>Total labeled: {{ total }}<br>
+       Correct labels: {{ correct }}<br>
+       Incorrect labels: {{ total - correct }}</p>
+
+    <p><small><strong>Note:</strong> "H" stands for Healthy and "B" stands for Unhealthy.</small></p>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#incorrectLabels" aria-expanded="false" aria-controls="incorrectLabels">
+        Incorrect Labels
+    </button>
+
+    <div class="collapse mt-3" id="incorrectLabels">
+        <div class="row">
+            {% for filename, user_label, correct_label in incorrect %}
+                <div class="col-md-4 mb-3">
+                    <img src="https://agro-ai-maize.s3.us-east-2.amazonaws.com/images_compressed/{{ filename }}" alt="Incorrect Image" class="img-fluid">
+                    <p><strong>Your Label:</strong> {{ user_label }} | <strong>Correct Label:</strong> {{ correct_label }}</p>
+                </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
+    {% else %}
+    <p>You haven't labeled any images yet.</p>
+    {% endif %}
 </div>
 
 {% endblock %}

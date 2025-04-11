@@ -10,12 +10,19 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="confidence-display mr-3">
+                <i class="fas fa-chart-line"></i>
+                Confidence: <strong>{{ "%.1f"|format(g.latest_confidence * 100) }}%</strong>
+            </div>
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="/label.html">Train</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/saved">Saved</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/analytics">Analytics</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
