@@ -2,8 +2,7 @@
 """@package web
 This method is responsible for the inner workings of the different web pages in this application.
 """
-from flask import Flask, g
-from flask import render_template, flash, redirect, url_for, session, request, jsonify
+from flask import Flask, g, render_template, flash, redirect, url_for, session, request, jsonify
 from flask_login import LoginManager, login_user, login_required, current_user, logout_user
 from app import app, db
 from app.models import User, Label, Image
@@ -14,8 +13,10 @@ from app.ML_Class import Active_ML_Model, AL_Encoder, ML_Model
 from app.SamplingMethods import lowestPercentage
 from app.forms import LabelForm
 from flask_bootstrap import Bootstrap
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 from sklearn.ensemble import RandomForestClassifier
+from collections import defaultdict
+from datetime import datetime
 import pandas as pd
 import os
 import numpy as np
@@ -224,11 +225,11 @@ def login():
         if user and check_password_hash(user.password, password):
             # Login the user and redirect to a protected page
             login_user(user)
-            return redirect(url_for('label'))  # Replace 'home' with the appropriate route
+            return redirect(url_for('label'))
         else:
             flash('Login failed. Please check your email and password and try again.', 'danger')
     
-    return render_template('login.html')  # Render the login form if it's a GET request
+    return render_template('login.html')
 
 @app.route('/logout')
 @login_required
@@ -261,12 +262,41 @@ def calculate_user_accuracy(return_counts=False):
     accuracy = round((correct / total) * 100, 2) if total > 0 else 0
     return (accuracy, total, correct, incorrect_images) if return_counts else accuracy
 
+def get_most_mislabeled_image():
+    base = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(base, 'data', 'csvOut.xlsx')
+    df = pd.read_excel(file_path, usecols=[0, 16], header=None)
+    df.columns = ['filename', 'true_label']
+    ground_truth = dict(zip(df['filename'], df['true_label']))
+
+    all_images = Image.query.all()
+    mislabel_counts = defaultdict(int)
+
+    for img in all_images:
+        true_label = ground_truth.get(img.filename)
+        if true_label and img.label.upper() != str(true_label).upper():
+            mislabel_counts[img.filename] += 1
+
+    if not mislabel_counts:
+        return None
+
+    most_mislabeled = max(mislabel_counts.items(), key=lambda x: x[1])
+    return {"filename": most_mislabeled[0], "count": most_mislabeled[1]}
+
 @app.before_request
 def before_request():
     if current_user.is_authenticated:
         latest_label = Label.query.filter_by(user_id=current_user.id).order_by(desc(Label.id)).first()
         g.latest_confidence = latest_label.confidence if latest_label else 0.0
 
+def ordinal(n):
+    return str(n) + (
+        "th" if 11 <= n % 100 <= 13 else
+        {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
+    )
+
+def format_timestamp(dt):
+    return dt.strftime('%B {S}, %Y at %I:%M %p UTC').replace('{S}', ordinal(dt.day))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -335,25 +365,24 @@ def profile():
 @app.route('/saved')
 @login_required
 def saved():
-    # Query images based on the current user and their labels
     healthy_plants = Image.query.filter_by(user_id=current_user.id, label='H').all()
     unhealthy_plants = Image.query.filter_by(user_id=current_user.id, label='B').all()
 
-    # Count the healthy and unhealthy images
     healthy_count = len(healthy_plants)
     unhealthy_count = len(unhealthy_plants)
 
-    # Prepare the image URLs and pass them to the template
     healthy_plants_data = [{
         'image_url': f"https://agro-ai-maize.s3.us-east-2.amazonaws.com/images_compressed/{plant.filename}",
         'name': plant.filename,
-        'details_url': f"/image/{plant.id}"
+        'details_url': f"/image/{plant.id}",
+        'timestamp': format_timestamp(plant.timestamp)
     } for plant in healthy_plants]
 
     unhealthy_plants_data = [{
         'image_url': f"https://agro-ai-maize.s3.us-east-2.amazonaws.com/images_compressed/{plant.filename}",
         'name': plant.filename,
-        'details_url': f"/image/{plant.id}"
+        'details_url': f"/image/{plant.id}",
+        'timestamp': format_timestamp(plant.timestamp)
     } for plant in unhealthy_plants]
 
     return render_template('saved.html', 
@@ -437,6 +466,22 @@ def feedback(h_list,u_list,h_conf_list,u_conf_list):
 def analytics():
     accuracy, total, correct, incorrect_images = calculate_user_accuracy(return_counts=True)
 
-    return render_template('analytics.html', accuracy=accuracy, total=total, correct=correct, incorrect=incorrect_images)
+    top_mislabeled = (
+    db.session.query(Image.filename, func.count().label('count'))
+    .filter(Image.label.isnot(None))
+    .group_by(Image.filename)
+    .order_by(func.count().desc())
+    .limit(3)
+    .all()
+)
+
+    top_mislabeled_images = [{'filename': img.filename, 'count': img.count} for img in top_mislabeled]
+
+    return render_template('analytics.html', 
+                           accuracy=accuracy, 
+                           total=total, 
+                           correct=correct, 
+                           incorrect=incorrect_images, 
+                           top_mislabeled_images=top_mislabeled_images)
 
 #app.run( host='127.0.0.1', port=5000, debug='True', use_reloader = False)
