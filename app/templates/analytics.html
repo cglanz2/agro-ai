@@ -67,6 +67,19 @@
     {% else %}
     <p>You haven't labeled any images yet.</p>
     {% endif %}
+
+    {% if top_mislabeled_images %}
+    <hr>
+    <h4 class="mt-4">Top 3 Most Mislabeled Images (All Users)</h4>
+    <div class="row justify-content-center">
+        {% for image in top_mislabeled_images %}
+        <div class="col-md-4 text-center mb-4">
+            <img src="https://agro-ai-maize.s3.us-east-2.amazonaws.com/images_compressed/{{ image.filename }}" alt="Mislabeled Image" class="img-fluid mb-2" style="max-width: 300px;">
+            <p><strong>Times Mislabeled:</strong> {{ image.count }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}       
 </div>
 
 {% endblock %}
