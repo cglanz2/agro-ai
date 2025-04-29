@@ -1,4 +1,5 @@
 from flask_login import UserMixin
+from sqlalchemy import JSON
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -8,13 +9,13 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(128), nullable=False)
     images = db.relationship('Image', backref='user', lazy=True)
     labels = db.relationship('Label', backref='user', lazy=True)
+    session = db.Column(JSON, nullable=True, default=dict)
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
 
     def check_password(self, password):
         return check_password_hash(self.password, password)
-
 
 class Image(db.Model):
     id = db.Column(db.Integer, primary_key=True)

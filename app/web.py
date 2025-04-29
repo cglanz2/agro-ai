@@ -88,8 +88,8 @@ def renderLabel(form):
     queue = session['queue']
     img = queue.pop()
     session['queue'] = queue
-    return render_template(url_for('label'), form = form, picture = img, confidence = session['confidence'])
-
+    return render_template(url_for('label'), form = form, picture = img, confidence = session['confidence']) 
+  
 def initializeAL(form, confidence_break = .7):
     """
     Initializes the active learning model and sets up the webpage with everything needed to run the application.
@@ -192,6 +192,15 @@ def prepairResults(form):
         new_label = Label(text=label, image_id=new_image.id, user_id=user_id, confidence=confidence_score)
         db.session.add(new_label)
         db.session.commit()
+        
+    if session['train'] != None:
+        session['train'] = session.get('train', [])
+        session['train'].extend(session['sample'])
+    else:
+        session['train'] = session['sample']
+
+    data = getData()
+    ml_model, train_img_names = createMLModel(data)
     
     session['confidence'] = np.mean(ml_model.K_fold())
     session['labels'] = []
@@ -222,9 +231,10 @@ def login():
         user = User.query.filter_by(email=email).first()
 
         if user and check_password_hash(user.password, password):
-            # Login the user and redirect to a protected page
             login_user(user)
-            return redirect(url_for('label'))  # Replace 'home' with the appropriate route
+            if user.session:
+                session.update(user.session) 
+            return redirect(url_for('label'))
         else:
             flash('Login failed. Please check your email and password and try again.', 'danger')
     
@@ -399,7 +409,7 @@ def label():
         session['labels'].append(form.choice.data)
         return renderLabel(form)
 
-    return render_template('label.html', form=form, confidence=latest_confidence)
+    return renderLabel(form)
 
 @app.route("/intermediate.html",methods=['GET'])
 @login_required
@@ -440,3 +450,10 @@ def analytics():
     return render_template('analytics.html', accuracy=accuracy, total=total, correct=correct, incorrect=incorrect_images)
 
 #app.run( host='127.0.0.1', port=5000, debug='True', use_reloader = False)
+
+# after every request, save back into the User.session JSON column
+@app.teardown_request
+def save_user_session(exc):
+    if current_user.is_authenticated:
+        current_user.session = dict(session)
+        db.session.commit()
