@@ -1,0 +1,524 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>app.web &mdash; agro-ai 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            agro-ai
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">agro-ai</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">agro-ai</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">app.web</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for app.web</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding:utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;@package web</span>
+<span class="sd">This method is responsible for the inner workings of the different web pages in this application.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flask</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flask</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flask</span><span class="w"> </span><span class="kn">import</span> <span class="n">render_template</span><span class="p">,</span> <span class="n">flash</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">url_for</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">jsonify</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flask_login</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoginManager</span><span class="p">,</span> <span class="n">login_user</span><span class="p">,</span> <span class="n">login_required</span><span class="p">,</span> <span class="n">current_user</span><span class="p">,</span> <span class="n">logout_user</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">app</span><span class="w"> </span><span class="kn">import</span> <span class="n">app</span><span class="p">,</span> <span class="n">db</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">app.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span><span class="p">,</span> <span class="n">Label</span><span class="p">,</span> <span class="n">Image</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">werkzeug.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_password_hash</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">werkzeug.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_password_hash</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">app.DataPreprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataPreprocessing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">app.ML_Class</span><span class="w"> </span><span class="kn">import</span> <span class="n">Active_ML_Model</span><span class="p">,</span> <span class="n">AL_Encoder</span><span class="p">,</span> <span class="n">ML_Model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">app.SamplingMethods</span><span class="w"> </span><span class="kn">import</span> <span class="n">lowestPercentage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">app.forms</span><span class="w"> </span><span class="kn">import</span> <span class="n">LabelForm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flask_bootstrap</span><span class="w"> </span><span class="kn">import</span> <span class="n">Bootstrap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">StringIO</span>
+
+<span class="n">bootstrap</span> <span class="o">=</span> <span class="n">Bootstrap</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+<span class="n">login_manager</span> <span class="o">=</span> <span class="n">LoginManager</span><span class="p">()</span>
+<span class="n">login_manager</span><span class="o">.</span><span class="n">init_app</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+<span class="n">login_manager</span><span class="o">.</span><span class="n">login_view</span> <span class="o">=</span> <span class="s2">&quot;login&quot;</span>  <span class="c1"># Redirect to login page if user is not logged in</span>
+
+<div class="viewcode-block" id="getData">
+<a class="viewcode-back" href="../../app.html#app.web.getData">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">getData</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gets and returns the csvOut.csv as a DataFrame.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    data : Pandas DataFrame</span>
+<span class="sd">        The data that contains the features for each image.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">s3</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s1">&#39;s3&#39;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;s3://agro-ai-maize/csvOut.csv&#39;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error: &#39;</span> <span class="o">+</span> <span class="n">path</span> <span class="o">+</span> <span class="s1">&#39; not found.&#39;</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;2&#39;</span><span class="p">,</span><span class="s1">&#39;3&#39;</span><span class="p">,</span><span class="s1">&#39;4&#39;</span><span class="p">,</span><span class="s1">&#39;5&#39;</span><span class="p">,</span><span class="s1">&#39;6&#39;</span><span class="p">,</span><span class="s1">&#39;7&#39;</span><span class="p">,</span><span class="s1">&#39;8&#39;</span><span class="p">,</span><span class="s1">&#39;9&#39;</span><span class="p">,</span><span class="s1">&#39;10&#39;</span><span class="p">,</span><span class="s1">&#39;11&#39;</span><span class="p">,</span><span class="s1">&#39;12&#39;</span><span class="p">,</span><span class="s1">&#39;13&#39;</span><span class="p">,</span><span class="s1">&#39;14&#39;</span><span class="p">,</span><span class="s1">&#39;15&#39;</span><span class="p">,</span><span class="s1">&#39;16&#39;</span><span class="p">]</span>
+
+    <span class="n">data_mod</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">astype</span><span class="p">({</span><span class="s1">&#39;8&#39;</span><span class="p">:</span> <span class="s1">&#39;int32&#39;</span><span class="p">,</span><span class="s1">&#39;9&#39;</span><span class="p">:</span> <span class="s1">&#39;int32&#39;</span><span class="p">,</span><span class="s1">&#39;10&#39;</span><span class="p">:</span> <span class="s1">&#39;int32&#39;</span><span class="p">,</span><span class="s1">&#39;12&#39;</span><span class="p">:</span> <span class="s1">&#39;int32&#39;</span><span class="p">,</span><span class="s1">&#39;14&#39;</span><span class="p">:</span> <span class="s1">&#39;int32&#39;</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">data_mod</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="createMLModel">
+<a class="viewcode-back" href="../../app.html#app.web.createMLModel">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">createMLModel</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepares the training set and creates a machine learning model using the training set.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : Pandas DataFrame</span>
+<span class="sd">        The data that contains the features for each image</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ml_model : ML_Model class object</span>
+<span class="sd">        ml_model created from the training set.</span>
+<span class="sd">    train_img_names : String</span>
+<span class="sd">        The names of the images.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">train_img_names</span><span class="p">,</span> <span class="n">train_img_label</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">]))</span>
+    <span class="n">train_set</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">train_img_names</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">train_set</span><span class="p">[</span><span class="s1">&#39;y_value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">train_img_label</span>
+    <span class="n">ml_model</span> <span class="o">=</span> <span class="n">ML_Model</span><span class="p">(</span><span class="n">train_set</span><span class="p">,</span> <span class="n">RandomForestClassifier</span><span class="p">(),</span> <span class="n">DataPreprocessing</span><span class="p">(</span><span class="kc">True</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">ml_model</span><span class="p">,</span> <span class="n">train_img_names</span></div>
+
+
+<div class="viewcode-block" id="renderLabel">
+<a class="viewcode-back" href="../../app.html#app.web.renderLabel">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">renderLabel</span><span class="p">(</span><span class="n">form</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepares a render_template to show the label.html web page.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    form : LabelForm class object</span>
+<span class="sd">        form to be used when displaying label.html</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    render_template : flask function</span>
+<span class="sd">        renders the label.html webpage.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">queue</span> <span class="o">=</span> <span class="n">session</span><span class="p">[</span><span class="s1">&#39;queue&#39;</span><span class="p">]</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+    <span class="n">session</span><span class="p">[</span><span class="s1">&#39;queue&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">queue</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">),</span> <span class="n">form</span> <span class="o">=</span> <span class="n">form</span><span class="p">,</span> <span class="n">picture</span> <span class="o">=</span> <span class="n">img</span><span class="p">,</span> <span class="n">confidence</span> <span class="o">=</span> <span class="n">session</span><span class="p">[</span><span class="s1">&#39;confidence&#39;</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="initializeAL">
+<a class="viewcode-back" href="../../app.html#app.web.initializeAL">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">initializeAL</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">confidence_break</span> <span class="o">=</span> <span class="mf">.7</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Initializes the active learning model and sets up the webpage with everything needed to run the application.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    form : LabelForm class object</span>
+<span class="sd">        form to be used when displaying label.html</span>
+<span class="sd">    confidence_break : number</span>
+<span class="sd">        How confident the model is.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    render_template : flask function</span>
+<span class="sd">        renders the label.html webpage.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">preprocess</span> <span class="o">=</span> <span class="n">DataPreprocessing</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">ml_classifier</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">getData</span><span class="p">()</span>
+    <span class="n">al_model</span> <span class="o">=</span> <span class="n">Active_ML_Model</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ml_classifier</span><span class="p">,</span> <span class="n">preprocess</span><span class="p">)</span>
+
+    <span class="n">session</span><span class="p">[</span><span class="s1">&#39;confidence&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">session</span><span class="p">[</span><span class="s1">&#39;confidence_break&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">confidence_break</span>
+    <span class="n">session</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">session</span><span class="p">[</span><span class="s1">&#39;sample_idx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">al_model</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">session</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">al_model</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">session</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">al_model</span><span class="o">.</span><span class="n">train</span>
+    <span class="n">session</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">session</span><span class="p">[</span><span class="s1">&#39;queue&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">al_model</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">renderLabel</span><span class="p">(</span><span class="n">form</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="getNextSetOfImages">
+<a class="viewcode-back" href="../../app.html#app.web.getNextSetOfImages">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">getNextSetOfImages</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">sampling_method</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Uses a sampling method to get the next set of images needed to be labeled.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    form : LabelForm class object</span>
+<span class="sd">        form to be used when displaying label.html</span>
+<span class="sd">    sampling_method : SamplingMethods Function</span>
+<span class="sd">        function that returns the queue and the new test set that does not contain the queue.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    render_template : flask function</span>
+<span class="sd">        renders the label.html webpage.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">getData</span><span class="p">()</span>
+    <span class="n">ml_model</span><span class="p">,</span> <span class="n">train_img_names</span> <span class="o">=</span> <span class="n">createMLModel</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">test_set</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">train_img_names</span><span class="p">)</span> <span class="o">==</span> <span class="kc">False</span><span class="p">]</span>
+
+    <span class="n">session</span><span class="p">[</span><span class="s1">&#39;sample_idx&#39;</span><span class="p">],</span> <span class="n">session</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sampling_method</span><span class="p">(</span><span class="n">ml_model</span><span class="p">,</span> <span class="n">test_set</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="n">session</span><span class="p">[</span><span class="s1">&#39;queue&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">session</span><span class="p">[</span><span class="s1">&#39;sample_idx&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">renderLabel</span><span class="p">(</span><span class="n">form</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="prepairResults">
+<a class="viewcode-back" href="../../app.html#app.web.prepairResults">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepairResults</span><span class="p">(</span><span class="n">form</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates the new machine learning model and gets the confidence of the machine learning model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    form : LabelForm class object</span>
+<span class="sd">        form to be used when displaying label.html</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    render_template : flask function</span>
+<span class="sd">        renders the appropriate webpage based on new confidence score.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">session</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">choice</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">session</span><span class="p">[</span><span class="s1">&#39;sample&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;sample_idx&#39;</span><span class="p">],</span> <span class="n">session</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">]))</span>
+    
+    <span class="c1"># Ensure user is logged in and user_id is available</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">current_user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;login&#39;</span><span class="p">))</span>
+
+    <span class="c1"># Retrieve user_id from the logged-in user (current_user)</span>
+    <span class="n">user_id</span> <span class="o">=</span> <span class="n">current_user</span><span class="o">.</span><span class="n">id</span>
+    
+    <span class="c1">#loops through session[&#39;session&#39;] and adds the image and label to the database</span>
+    <span class="k">for</span> <span class="n">filename</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">session</span><span class="p">[</span><span class="s1">&#39;sample&#39;</span><span class="p">]:</span>
+        <span class="n">new_image</span> <span class="o">=</span> <span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">new_image</span><span class="p">)</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="n">new_label</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">image_id</span><span class="o">=</span><span class="n">new_image</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">)</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">new_label</span><span class="p">)</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        
+    <span class="k">if</span> <span class="n">session</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">session</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">session</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">session</span><span class="p">[</span><span class="s1">&#39;sample&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">session</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">session</span><span class="p">[</span><span class="s1">&#39;sample&#39;</span><span class="p">]</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">getData</span><span class="p">()</span>
+    <span class="n">ml_model</span><span class="p">,</span> <span class="n">train_img_names</span> <span class="o">=</span> <span class="n">createMLModel</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="n">session</span><span class="p">[</span><span class="s1">&#39;confidence&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">ml_model</span><span class="o">.</span><span class="n">K_fold</span><span class="p">())</span>
+    <span class="n">session</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">session</span><span class="p">[</span><span class="s1">&#39;confidence&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">session</span><span class="p">[</span><span class="s1">&#39;confidence_break&#39;</span><span class="p">]:</span>
+        <span class="n">health_pic</span><span class="p">,</span> <span class="n">blight_pic</span> <span class="o">=</span> <span class="n">ml_model</span><span class="o">.</span><span class="n">infoForProgress</span><span class="p">(</span><span class="n">train_img_names</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;intermediate.html&#39;</span><span class="p">,</span> <span class="n">form</span> <span class="o">=</span> <span class="n">form</span><span class="p">,</span> <span class="n">confidence</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:.2%}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;confidence&#39;</span><span class="p">],</span><span class="mi">4</span><span class="p">)),</span> <span class="n">health_user</span> <span class="o">=</span> <span class="n">health_pic</span><span class="p">,</span> <span class="n">blight_user</span> <span class="o">=</span> <span class="n">blight_pic</span><span class="p">,</span> <span class="n">healthNum_user</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">health_pic</span><span class="p">),</span> <span class="n">blightNum_user</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">blight_pic</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">test_set</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">],</span> <span class="p">:]</span>
+        <span class="n">health_pic_user</span><span class="p">,</span> <span class="n">blight_pic_user</span><span class="p">,</span> <span class="n">health_pic</span><span class="p">,</span> <span class="n">blight_pic</span><span class="p">,</span> <span class="n">health_pic_prob</span><span class="p">,</span> <span class="n">blight_pic_prob</span> <span class="o">=</span> <span class="n">ml_model</span><span class="o">.</span><span class="n">infoForResults</span><span class="p">(</span><span class="n">train_img_names</span><span class="p">,</span> <span class="n">test_set</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;final.html&#39;</span><span class="p">,</span> <span class="n">form</span> <span class="o">=</span> <span class="n">form</span><span class="p">,</span> <span class="n">confidence</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:.2%}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;confidence&#39;</span><span class="p">],</span><span class="mi">4</span><span class="p">)),</span> <span class="n">health_user</span> <span class="o">=</span> <span class="n">health_pic_user</span><span class="p">,</span> <span class="n">blight_user</span> <span class="o">=</span> <span class="n">blight_pic_user</span><span class="p">,</span> <span class="n">healthNum_user</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">health_pic_user</span><span class="p">),</span> <span class="n">blightNum_user</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">blight_pic_user</span><span class="p">),</span> <span class="n">health_test</span> <span class="o">=</span> <span class="n">health_pic</span><span class="p">,</span> <span class="n">unhealth_test</span> <span class="o">=</span> <span class="n">blight_pic</span><span class="p">,</span> <span class="n">healthyNum</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">health_pic</span><span class="p">),</span> <span class="n">unhealthyNum</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">blight_pic</span><span class="p">),</span> <span class="n">healthyPct</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:.2%}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">health_pic</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">200</span><span class="o">-</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">health_pic_user</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">blight_pic_user</span><span class="p">)))),</span> <span class="n">unhealthyPct</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:.2%}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">blight_pic</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">200</span><span class="o">-</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">health_pic_user</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">blight_pic_user</span><span class="p">)))),</span> <span class="n">h_prob</span> <span class="o">=</span> <span class="n">health_pic_prob</span><span class="p">,</span> <span class="n">b_prob</span> <span class="o">=</span> <span class="n">blight_pic_prob</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="load_user">
+<a class="viewcode-back" href="../../app.html#app.web.load_user">[docs]</a>
+<span class="nd">@login_manager</span><span class="o">.</span><span class="n">user_loader</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">user_id</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_user_by_email">
+<a class="viewcode-back" href="../../app.html#app.web.get_user_by_email">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_user_by_email</span><span class="p">(</span><span class="n">email</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="login">
+<a class="viewcode-back" href="../../app.html#app.web.login">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/login&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">login</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">email</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span>
+        <span class="n">password</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">]</span>
+        
+        <span class="c1"># Look for the user in the database</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">user</span> <span class="ow">and</span> <span class="n">check_password_hash</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">password</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+            <span class="c1"># Login the user and redirect to a protected page</span>
+            <span class="n">login_user</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">))</span>  <span class="c1"># Replace &#39;home&#39; with the appropriate route</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Login failed. Please check your email and password and try again.&#39;</span><span class="p">,</span> <span class="s1">&#39;danger&#39;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;login.html&#39;</span><span class="p">)</span>  <span class="c1"># Render the login form if it&#39;s a GET request</span></div>
+
+
+<div class="viewcode-block" id="logout">
+<a class="viewcode-back" href="../../app.html#app.web.logout">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/logout&#39;</span><span class="p">)</span>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">logout</span><span class="p">():</span>
+    <span class="n">logout_user</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;login&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="register">
+<a class="viewcode-back" href="../../app.html#app.web.register">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/register&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="c1"># Get form data</span>
+        <span class="n">email</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span>
+        <span class="n">password</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">]</span>
+        <span class="n">retype_password</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;retype-password&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Validate the passwords match</span>
+        <span class="k">if</span> <span class="n">password</span> <span class="o">!=</span> <span class="n">retype_password</span><span class="p">:</span>
+            <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Passwords do not match!&#39;</span><span class="p">,</span> <span class="s1">&#39;danger&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;register&#39;</span><span class="p">))</span>
+
+        <span class="c1"># Check if the email already exists in the database</span>
+        <span class="n">existing_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">existing_user</span><span class="p">:</span>
+            <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Email already exists. Please log in.&#39;</span><span class="p">,</span> <span class="s1">&#39;danger&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;login&#39;</span><span class="p">))</span>
+
+        <span class="c1"># Hash the password</span>
+        <span class="n">hashed_password</span> <span class="o">=</span> <span class="n">generate_password_hash</span><span class="p">(</span><span class="n">password</span><span class="p">)</span>
+
+        <span class="c1"># Create the new user</span>
+        <span class="n">new_user</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">hashed_password</span><span class="p">)</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">new_user</span><span class="p">)</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Registration successful! You can now log in.&#39;</span><span class="p">,</span> <span class="s1">&#39;success&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;login&#39;</span><span class="p">))</span>  <span class="c1"># Redirect to login page after successful registration</span>
+
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;register.html&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="profile">
+<a class="viewcode-back" href="../../app.html#app.web.profile">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/profile&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">profile</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">email</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span>
+        <span class="n">current_password</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;current_password&#39;</span><span class="p">]</span>
+        <span class="n">new_password</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;new_password&#39;</span><span class="p">]</span>
+        <span class="n">confirm_password</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;confirm_password&#39;</span><span class="p">]</span>
+        
+        <span class="c1"># Get the user from the database</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">get_user_by_email</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
+        
+        <span class="c1"># Check if the user exists and the current password is correct</span>
+        <span class="k">if</span> <span class="n">user</span> <span class="ow">and</span> <span class="n">user</span><span class="o">.</span><span class="n">check_password</span><span class="p">(</span><span class="n">current_password</span><span class="p">):</span>
+            <span class="c1"># Check if the new passwords match</span>
+            <span class="k">if</span> <span class="n">new_password</span> <span class="o">==</span> <span class="n">confirm_password</span><span class="p">:</span>
+                <span class="c1"># Update the user&#39;s password</span>
+                <span class="n">user</span><span class="o">.</span><span class="n">set_password</span><span class="p">(</span><span class="n">new_password</span><span class="p">)</span>  <span class="c1"># Make sure you have a method to hash and set the password</span>
+                
+                <span class="c1"># Commit the changes to the database</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+                
+                <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Password updated successfully!&#39;</span><span class="p">,</span> <span class="s1">&#39;success&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;New passwords do not match.&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Current password is incorrect.&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;profile&#39;</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;profile.html&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="saved">
+<a class="viewcode-back" href="../../app.html#app.web.saved">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/saved&#39;</span><span class="p">)</span>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">saved</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;saved.html&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="home">
+<a class="viewcode-back" href="../../app.html#app.web.home">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/index.html&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Redirects users based on login status:</span>
+<span class="sd">    - If logged in, redirect to label.html</span>
+<span class="sd">    - If not logged in, redirect to index.html</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;user_logged_in&#39;</span><span class="p">):</span>  <span class="c1"># Replace with the actual session check</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;label.html&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;index.html&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="label">
+<a class="viewcode-back" href="../../app.html#app.web.label">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/label.html&quot;</span><span class="p">,</span><span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">label</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Operates the label(label.html) web page.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">form</span> <span class="o">=</span> <span class="n">LabelForm</span><span class="p">()</span>
+    <span class="k">if</span> <span class="s1">&#39;model&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">session</span><span class="p">:</span><span class="c1">#Start</span>
+        <span class="k">return</span> <span class="n">initializeAL</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="mf">.7</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">session</span><span class="p">[</span><span class="s1">&#39;queue&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="p">[]</span> <span class="ow">and</span> <span class="n">session</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="p">[]:</span> <span class="c1"># Need more pictures</span>
+        <span class="k">return</span> <span class="n">getNextSetOfImages</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">lowestPercentage</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">form</span><span class="o">.</span><span class="n">is_submitted</span><span class="p">()</span> <span class="ow">and</span> <span class="n">session</span><span class="p">[</span><span class="s1">&#39;queue&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="p">[]:</span><span class="c1"># Finished Labeling</span>
+        <span class="k">return</span> <span class="n">prepairResults</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">form</span><span class="o">.</span><span class="n">is_submitted</span><span class="p">()</span> <span class="ow">and</span> <span class="n">session</span><span class="p">[</span><span class="s1">&#39;queue&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="p">[]:</span> <span class="c1">#Still gathering labels</span>
+        <span class="n">session</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">choice</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">renderLabel</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;label.html&#39;</span><span class="p">,</span> <span class="n">form</span> <span class="o">=</span> <span class="n">form</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="intermediate">
+<a class="viewcode-back" href="../../app.html#app.web.intermediate">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/intermediate.html&quot;</span><span class="p">,</span><span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">intermediate</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Operates the intermediate(intermediate.html) web page.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;intermediate.html&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="final">
+<a class="viewcode-back" href="../../app.html#app.web.final">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/final.html&quot;</span><span class="p">,</span><span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">final</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Operates the final(final.html) web page.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;final.html&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="feedback">
+<a class="viewcode-back" href="../../app.html#app.web.feedback">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/feedback/&lt;h_list&gt;/&lt;u_list&gt;/&lt;h_conf_list&gt;/&lt;u_conf_list&gt;&quot;</span><span class="p">,</span><span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">feedback</span><span class="p">(</span><span class="n">h_list</span><span class="p">,</span><span class="n">u_list</span><span class="p">,</span><span class="n">h_conf_list</span><span class="p">,</span><span class="n">u_conf_list</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Operates the feedback(feedback.html) web page.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">h_feedback_result</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">h_list</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">))</span>
+    <span class="n">u_feedback_result</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">u_list</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">))</span>
+    <span class="n">h_conf_result</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">h_conf_list</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">))</span>
+    <span class="n">u_conf_result</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">u_conf_list</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">))</span>
+    <span class="n">h_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">h_feedback_result</span><span class="p">)</span>
+    <span class="n">u_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">u_feedback_result</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;feedback.html&#39;</span><span class="p">,</span> <span class="n">healthy_list</span> <span class="o">=</span> <span class="n">h_feedback_result</span><span class="p">,</span> <span class="n">unhealthy_list</span> <span class="o">=</span> <span class="n">u_feedback_result</span><span class="p">,</span> <span class="n">healthy_conf_list</span> <span class="o">=</span> <span class="n">h_conf_result</span><span class="p">,</span> <span class="n">unhealthy_conf_list</span> <span class="o">=</span> <span class="n">u_conf_result</span><span class="p">,</span> <span class="n">h_list_length</span> <span class="o">=</span> <span class="n">h_length</span><span class="p">,</span> <span class="n">u_list_length</span> <span class="o">=</span> <span class="n">u_length</span><span class="p">)</span></div>
+
+
+<span class="c1">#app.run( host=&#39;127.0.0.1&#39;, port=5000, debug=&#39;True&#39;, use_reloader = False)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Team 16.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
