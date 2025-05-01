@@ -46,6 +46,7 @@
         <div class="col-lg-3 col-md-4 col-6 d-block mb-4 h-100">
             <img class="img-fluid img-rounded" src="{{ plant.image_url }}" alt="{{ plant.name }}">
             <h6 class="font-weight-normal">Filename: {{ plant.name }}</h6>
+            <p class="text-muted">Session: {{ plant.session_id }}</p>
             <p class="text-muted">Date Labeled: {{ plant.timestamp }}</p>
         </div>
         {% endfor %}
@@ -58,7 +59,8 @@
         <div class="col-lg-3 col-md-4 col-6 d-block mb-4 h-100">
             <img class="img-fluid img-rounded" src="{{ plant.image_url }}" alt="{{ plant.name }}">
             <h6 class="font-weight-normal">Filename: {{ plant.name }}</h6>
-            <p class="text-muted">Date Labeled: {{ timestamp }}</p>
+            <p class="text-muted">Session: {{ plant.session_id }}</p>
+            <p class="text-muted">Date Labeled: {{ plant.timestamp }}</p>
         </div>
         {% endfor %}
     </div>
@@ -69,7 +71,8 @@
         <div class="col-lg-3 col-md-4 col-6 d-block mb-4 h-100">
             <img class="img-fluid img-rounded" src="{{ plant.image_url }}" alt="{{ plant.name }}">
             <h6 class="font-weight-normal">Filename: {{ plant.name }}</h6>
-            <p class="text-muted">Date Labeled: {{ timestamp }}</p>
+            <p class="text-muted">Session: {{ plant.session_id }}</p>
+            <p class="text-muted">Date Labeled: {{ plant.timestamp }}</p>
         </div>
         {% endfor %}
     </div>
@@ -81,7 +84,8 @@
         <div class="col-lg-3 col-md-4 col-6 d-block mb-4 h-100">
             <img class="img-fluid img-rounded" src="{{ plant.image_url }}" alt="{{ plant.name }}">
             <h6 class="font-weight-normal">Filename: {{ plant.name }}</h6>
-            <p class="text-muted">Date Labeled: {{ timestamp }}</p>
+            <p class="text-muted">Session: {{ plant.session_id }}</p>
+            <p class="text-muted">Date Labeled: {{ plant.timestamp }}</p>
         </div>
         {% endfor %}
     </div>

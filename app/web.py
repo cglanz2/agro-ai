@@ -215,9 +215,13 @@ def save_to_database(image, label, user_id, confidence_score, model, session_id)
                 new_image = Image(filename=img, user_id=user_id, label=label)
                 db.session.add(new_image)
                 db.session.commit()
-            new_label = Label(text=label, image_id=new_image.id, user_id=user_id, confidence=confidence_score[i], model=model, session_id=session_id)
-            db.session.add(new_label)
-            db.session.commit()
+                new_label = Label(text=label, image_id=new_image.id, user_id=user_id, confidence=confidence_score[i], model=model, session_id=session_id)
+                db.session.add(new_label)
+                db.session.commit()
+            else:
+                new_label = Label(text=label, image_id=existing_image.id, user_id=user_id, confidence=confidence_score[i], model=model, session_id=session_id)
+                db.session.add(new_label)
+                db.session.commit()
     else:
         for i, img in enumerate(image):
             # Check if the image already exists in the database
@@ -226,9 +230,13 @@ def save_to_database(image, label, user_id, confidence_score, model, session_id)
                 new_image = Image(filename=img, user_id=user_id, label=label)
                 db.session.add(new_image)
                 db.session.commit()
-            new_label = Label(text=label, image_id=new_image.id, user_id=user_id, confidence=confidence_score, model=model, session_id=session_id)
-            db.session.add(new_label)
-            db.session.commit()
+                new_label = Label(text=label, image_id=new_image.id, user_id=user_id, confidence=confidence_score, model=model, session_id=session_id)
+                db.session.add(new_label)
+                db.session.commit()
+            else:
+                new_label = Label(text=label, image_id=existing_image.id, user_id=user_id, confidence=confidence_score, model=model, session_id=session_id)
+                db.session.add(new_label)
+                db.session.commit()
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -443,6 +451,9 @@ def saved():
         'timestamp': format_timestamp(timestamp),
         'session_id': session_id
     } for plant, session_id, timestamp in unhealthy_plants]
+    
+    for plant, session_id, timestamp in user_healthy_plants:
+        print(session_id)
 
     return render_template('saved.html', 
                            user_healthy_count=user_healthy_count,
@@ -531,7 +542,8 @@ def analytics():
 
     top_mislabeled = (
     db.session.query(Image.filename, func.count().label('count'))
-    .filter(Image.label.isnot(None))
+    .join(Label, Image.id == Label.image_id)
+    .filter(Label.model == False, Image.label.isnot(None))
     .group_by(Image.filename)
     .order_by(func.count().desc())
     .limit(3)
