@@ -259,7 +259,7 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-def calculate_accuracy(type, model, return_counts=False):
+def calculate_accuracy(user, model, per_user, return_counts=False):
     base = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.join(base, 'data', 'csvOut.xlsx')
     df = pd.read_excel(file_path, usecols=[0, 16], header=None)
@@ -267,19 +267,25 @@ def calculate_accuracy(type, model, return_counts=False):
     ground_truth = dict(zip(df['filename'], df['true_label']))
 
     if not current_user.is_authenticated:
-        flash('User not authenticated. Please log in.', 'danger')
-        return redirect(url_for('login'))
-    
-    if type == "all":
+            flash('User not authenticated. Please log in.', 'danger')
+            return redirect(url_for('login'))
+
+    if not per_user:    
+        if user == "all":
+            images = (db.session.query(Image.filename, Label.text, Session.id)
+                            .join(Label, Image.id == Label.image_id)      
+                            .join(Session, Label.session_id == Session.id) 
+                            .filter(Label.model == model).all())
+        elif user == "user":
+            images = (db.session.query(Image.filename, Label.text, Session.id)
+                            .join(Label, Image.id == Label.image_id)      
+                            .join(Session, Label.session_id == Session.id) 
+                            .filter(Label.user_id == current_user.id, Label.model == model).all())
+    else:
         images = (db.session.query(Image.filename, Label.text, Session.id)
-                        .join(Label, Image.id == Label.image_id)      
-                        .join(Session, Label.session_id == Session.id) 
-                        .filter(Label.model == model).all())
-    elif type == "user":
-        images = (db.session.query(Image.filename, Label.text, Session.id)
-                        .join(Label, Image.id == Label.image_id)      
-                        .join(Session, Label.session_id == Session.id) 
-                        .filter(Label.user_id == current_user.id, Label.model == model).all())
+                .join(Label, Image.id == Label.image_id)      
+                .join(Session, Label.session_id == Session.id) 
+                .filter(Label.user_id == user, Label.model == model).all())
         
     total = 0
     correct = 0
@@ -295,28 +301,51 @@ def calculate_accuracy(type, model, return_counts=False):
                 incorrect_images.append((filename, label, true_label, session_id))
 
     accuracy = round((correct / total) * 100, 2) if total > 0 else 0
-    return (accuracy, total, correct, incorrect_images) if return_counts else accuracy
+    
+    if not per_user:
+        return (accuracy, total, correct, incorrect_images) if return_counts else accuracy
+    else:
+        return accuracy if return_counts else accuracy
 
-def get_most_mislabeled_image():
+def get_most_mislabeled_image(user, model):
     base = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.join(base, 'data', 'csvOut.xlsx')
     df = pd.read_excel(file_path, usecols=[0, 16], header=None)
     df.columns = ['filename', 'true_label']
     ground_truth = dict(zip(df['filename'], df['true_label']))
-
-    all_images = Image.query.all()
+    
     mislabel_counts = defaultdict(int)
+    
+    if not current_user.is_authenticated:
+        flash('User not authenticated. Please log in.', 'danger')
+        return redirect(url_for('login'))
 
-    for img in all_images:
-        true_label = ground_truth.get(img.filename)
-        if true_label and img.label.upper() != str(true_label).upper():
-            mislabel_counts[img.filename] += 1
+    if user == "all":
+        images = (db.session.query(Image.filename, Label.text, Session.id)
+                        .join(Label, Image.id == Label.image_id)      
+                        .join(Session, Label.session_id == Session.id) 
+                        .filter(Label.model == model).all())
+    elif user == "user":
+        images = (db.session.query(Image.filename, Label.text, Session.id)
+                        .join(Label, Image.id == Label.image_id)      
+                        .join(Session, Label.session_id == Session.id) 
+                        .filter(Label.user_id == current_user.id, Label.model == model).all())
+
+    for filename, label, session_id in images:
+        true_label = ground_truth.get(filename)
+        if true_label and label.upper() != str(true_label).upper():
+            mislabel_counts[filename] += 1
 
     if not mislabel_counts:
         return None
-
-    most_mislabeled = max(mislabel_counts.items(), key=lambda x: x[1])
-    return {"filename": most_mislabeled[0], "count": most_mislabeled[1]}
+    
+    most_mislabeled = sorted(mislabel_counts.items(), key=lambda x: x[1], reverse=True)[:3]
+    most_mislabeled = {item[0]: item[1] for item in most_mislabeled}
+    if most_mislabeled:
+        print(most_mislabeled)
+        for filename, count in most_mislabeled.items():
+            print(f"Image: {filename}, Mislabeled Count: {count}")
+    return most_mislabeled
 
 @app.before_request
 def before_request():
@@ -537,21 +566,18 @@ def feedback(h_list,u_list,h_conf_list,u_conf_list):
 @app.route('/analytics')
 @login_required
 def analytics():
-    user_accuracy, user_total, user_correct, user_incorrect_images = calculate_accuracy("user", False, return_counts=True)
-    user_model_accuracy, user_model_total, user_model_correct, user_model_incorrect_images = calculate_accuracy("user", True, return_counts=True)
-    all_user_accuracy, all_user_total, all_user_correct, all_user_incorrect_images = calculate_accuracy("all", False, return_counts=True)
-    all_model_accuracy, all_model_total, all_model_correct, all_model_incorrect_images = calculate_accuracy("all", True, return_counts=True)
+    user_accuracy, user_total, user_correct, user_incorrect_images = calculate_accuracy("user", False, False, return_counts=True)
+    user_model_accuracy, user_model_total, user_model_correct, user_model_incorrect_images = calculate_accuracy("user", True, False, return_counts=True)
+    all_user_accuracy, all_user_total, all_user_correct, all_user_incorrect_images = calculate_accuracy("all", False, False, return_counts=True)
+    all_model_accuracy, all_model_total, all_model_correct, all_model_incorrect_images = calculate_accuracy("all", True, False, return_counts=True)
 
-    top_mislabeled = (
-    db.session.query(Image.filename, func.count().label('count'))
-    .join(Label, Image.id == Label.image_id)
-    .filter(Label.model == False, Image.label.isnot(None))
-    .group_by(Image.filename)
-    .order_by(func.count().desc())
-    .limit(3)
-    .all())
-
-    top_mislabeled_images = [{'filename': img[0], 'count': img[1]} for img in top_mislabeled]
+    top_mislabeled_images_user = get_most_mislabeled_image("user", False)
+    top_mislabeled_images_all_users = get_most_mislabeled_image("all", False)
+    top_mislabeled_images_user_model = get_most_mislabeled_image("user", True)
+    top_mislabeled_images_all_users_model = get_most_mislabeled_image("all", True)
+    top_user_accuracy = get_top_users(False) #done-web
+    top_user_models_accuracy = get_top_users(True) #done-web
+    top_user_image_model_confidence = get_top_confidence() #done-web
 
     return render_template('analytics.html', 
                             user_accuracy=user_accuracy, 
@@ -570,7 +596,38 @@ def analytics():
                             all_model_total=all_model_total,
                             all_model_correct=all_model_correct,
                             all_model_incorrect_images=all_model_incorrect_images, 
-                            top_mislabeled_images=top_mislabeled_images)
+                            top_mislabeled_images_user=top_mislabeled_images_user,
+                            top_mislabeled_images_all_users=top_mislabeled_images_all_users,
+                            top_mislabeled_images_user_model=top_mislabeled_images_user_model,
+                            top_mislabeled_images_all_users_model=top_mislabeled_images_all_users_model,
+                            top_user_accuracy = top_user_accuracy,
+                            top_user_models_accuracy = top_user_models_accuracy,
+                            top_user_image_model_confidence = top_user_image_model_confidence)
+    
+def get_top_users(model):
+    users = (db.session.query(User.id, User.email)
+             .all())
+
+    user_accuracies = []
+
+    for user_id, email in users:
+        accuracy = calculate_accuracy(user_id, model, True, return_counts=False)
+        user_accuracies.append((email, accuracy))
+    
+    # Sort users by accuracy in descending order and take the top 5
+    top_users = sorted(user_accuracies, key=lambda x: x[1], reverse=True)[:5]
+
+    return top_users
+
+def get_top_confidence():
+    return (db.session.query(Image.filename, Label.confidence, Session.id, Label.text)
+            .join(Label, Image.id == Label.image_id)
+            .join(Session, Label.session_id == Session.id)
+            .filter(Label.user_id == current_user.id, Label.model == True)
+            .group_by(Image.filename)
+            .order_by(Label.confidence.desc())
+            .limit(3)
+            .all())
 
 
 

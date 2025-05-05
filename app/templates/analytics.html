@@ -84,30 +84,118 @@
     <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#incorrectLabels" aria-expanded="false" aria-controls="incorrectLabels">
         Your Incorrect Labels
     </button>
+    
 
     <div class="collapse mt-3" id="incorrectLabels">
         <div class="row">
-            {% for filename, user_label, correct_label, session_id in incorrect %}
-                <div class="col-md-4 mb-3">
-                    <img src="https://agro-ai-maize.s3.us-east-2.amazonaws.com/images_compressed/{{ filename }}" alt="Incorrect Image" class="img-fluid">
-                    <p><strong>Your Label:</strong> {{ user_label }} | <strong>Correct Label:</strong> {{ correct_label }} | <strong>Session:</strong> {{ session_id }}</p>
-                </div>
-            {% endfor %}
+            {% if user_incorrect_images %}
+                {% for filename, user_label, correct_label, session_id in user_incorrect_images %}
+                    <div class="col-md-4 mb-3">
+                        <img src="https://agro-ai-maize.s3.us-east-2.amazonaws.com/images_compressed/{{ filename }}" alt="Incorrect Image" class="img-fluid">
+                        <p><strong>Image:</strong> {{ filename }}</p>
+                        <p><strong>Your Label:</strong> {{ user_label }} | <strong>Correct Label:</strong> {{ correct_label }} | <strong>Session:</strong> {{ session_id }}</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p><small><strong>Congrats:</strong> You mislabeled no images.</small></p>
+            {% endif %}    
         </div>
     </div>
 
-    {% if top_mislabeled_images %}
+    {% if top_user_accuracy %}
     <hr>
-    <h4 class="mt-4">Top 3 Most Mislabeled Images (All Users)</h4>
-    <div class="row justify-content-center">
-        {% for image in top_mislabeled_images %}
-        <div class="col-md-4 text-center mb-4">
-            <img src="https://agro-ai-maize.s3.us-east-2.amazonaws.com/images_compressed/{{ image.filename }}" alt="Mislabeled Image" class="img-fluid mb-2" style="max-width: 300px;">
-            <p><strong>Times Mislabeled:</strong> {{ image.count }}</p>
+    <h4 class="mt-4">Top 5 Most Accurate Users</h4>
+    <div class="mt-4">
+        {% for email, accuracy in top_user_accuracy %}
+        <div>
+            <p><strong>{{ loop.index }}. User:</strong> {{ email }} <strong> - Accuracy:</strong> {{ accuracy }}%</p>
         </div>
         {% endfor %}
     </div>
-    {% endif %}       
+    {% endif %}
+
+
+    {% if top_user_models_accuracy %}
+    <hr>
+    <h4 class="mt-4">Top 5 Most Accurate User Models</h4>
+    <div class="mt-4">
+        {% for email, accuracy in top_user_models_accuracy %}
+        <div>
+            <p><strong>{{ loop.index }}. User:</strong> {{ email }} <strong> - Accuracy:</strong> {{ accuracy }}%</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if top_user_image_model_confidence %}
+    <hr>
+    <h4 class="mt-4">Top 3 Highest Confidence Images</h4>
+    <div class="row justify-content-center">
+        {% for filename, confidence, session_id, label in top_user_image_model_confidence %}
+        <div class="col-md-4 text-center mb-4">
+            <img src="https://agro-ai-maize.s3.us-east-2.amazonaws.com/images_compressed/{{ filename }}" alt="Mislabeled Image" class="img-fluid mb-2" style="max-width: 300px;">
+            <p><strong>{{ loop.index }}. Image:</strong> {{ filename }} | <strong>Label:</strong> {{ label }} | <strong>Session:</strong> {{ session_id }}</p>
+            <p><strong>Model Confidence:</strong> {{ confidence }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if top_mislabeled_images_user %}
+    <hr>
+    <h4 class="mt-4">Top 3 Most Mislabeled Images (Current User)</h4>
+    <div class="row justify-content-center">
+        {% for filename, count in top_mislabeled_images_user.items() %}
+        <div class="col-md-4 text-center mb-4">
+            <img src="https://agro-ai-maize.s3.us-east-2.amazonaws.com/images_compressed/{{ filename }}" alt="Mislabeled Image" class="img-fluid mb-2" style="max-width: 300px;">
+            <p><strong>{{ loop.index }}. Image:</strong> {{ filename }}</p>
+            <p><strong>Times Mislabeled:</strong> {{ count }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if top_mislabeled_images_all_users %}
+    <hr>
+    <h4 class="mt-4">Top 3 Most Mislabeled Images (All Users)</h4>
+    <div class="row justify-content-center">
+        {% for filename, count in top_mislabeled_images_all_users.items() %}
+        <div class="col-md-4 text-center mb-4">
+            <img src="https://agro-ai-maize.s3.us-east-2.amazonaws.com/images_compressed/{{ filename }}" alt="Mislabeled Image" class="img-fluid mb-2" style="max-width: 300px;">
+            <p><strong>{{ loop.index }}. Image:</strong> {{ filename }}</p>
+            <p><strong>Times Mislabeled:</strong> {{ count }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}    
+    
+    {% if top_mislabeled_images_user_model %}
+    <hr>
+    <h4 class="mt-4">Top 3 Most Mislabeled Images (Current User's Models)</h4>
+    <div class="row justify-content-center">
+        {% for filename, count in top_mislabeled_images_user_model.items() %}
+        <div class="col-md-4 text-center mb-4">
+            <img src="https://agro-ai-maize.s3.us-east-2.amazonaws.com/images_compressed/{{ filename }}" alt="Mislabeled Image" class="img-fluid mb-2" style="max-width: 300px;">
+            <p><strong>{{ loop.index }}. Image:</strong> {{ filename }}</p>
+            <p><strong>Times Mislabeled:</strong> {{ count }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}    
+
+    {% if top_mislabeled_images_all_users_model %}
+    <hr>
+    <h4 class="mt-4">Top 3 Most Mislabeled Images (All Users' Models)</h4>
+    <div class="row justify-content-center">
+        {% for filename, count in top_mislabeled_images_all_users_model.items() %}
+        <div class="col-md-4 text-center mb-4">
+            <img src="https://agro-ai-maize.s3.us-east-2.amazonaws.com/images_compressed/{{ filename }}" alt="Mislabeled Image" class="img-fluid mb-2" style="max-width: 300px;">
+            <p><strong>{{ loop.index }}. Image:</strong> {{ filename }}</p>
+            <p><strong>Times Mislabeled:</strong> {{ count }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}    
 </div>
 
 {% endblock %}
