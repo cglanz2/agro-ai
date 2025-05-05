@@ -40,33 +40,61 @@
 
 <div class="container mt-4">
     <h3 class="font-weight-light">Labeling Accuracy</h3>
-    <hr>
-    <p>Your current accuracy: <strong>{{ accuracy }}%</strong></p>
+    <div class="row">
+        <div class="col-md-6">
+            <p>Your accuracy: <strong>{{ user_accuracy }}%</strong></p>
 
-    {% if total > 0 %}
-    <p>Total labeled: {{ total }}<br>
-       Correct labels: {{ correct }}<br>
-       Incorrect labels: {{ total - correct }}</p>
+            {% if user_total > 0 %}
+            <p>Total labeled: {{ user_total }}<br>
+               Correct labels: {{ user_correct }}<br>
+               Incorrect labels: {{ user_total - user_correct }}</p>
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            <p>Your Model's accuracy: <strong>{{ user_model_accuracy }}%</strong></p>
+
+            {% if user_model_total > 0 %}
+            <p>Total labeled: {{ user_model_total }}<br>
+               Correct labels: {{ user_model_correct }}<br>
+               Incorrect labels: {{ user_model_total - user_model_correct }}</p>
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            <p>All User's accuracy: <strong>{{ all_user_accuracy }}%</strong></p>
+
+            {% if all_user_total > 0 %}
+            <p>Total labeled: {{ all_user_total }}<br>
+               Correct labels: {{ all_user_correct }}<br>
+               Incorrect labels: {{ all_user_total - all_user_correct }}</p>
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            <p>All User's Model accuracy: <strong>{{ all_model_accuracy }}%</strong></p>
+
+            {% if all_model_total > 0 %}
+            <p>Total labeled: {{ all_model_total }}<br>
+               Correct labels: {{ all_model_correct }}<br>
+               Incorrect labels: {{ all_model_total - all_model_correct }}</p>
+            {% endif %}
+        </div>
+    </div>
 
     <p><small><strong>Note:</strong> "H" stands for Healthy and "B" stands for Unhealthy.</small></p>
 
     <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#incorrectLabels" aria-expanded="false" aria-controls="incorrectLabels">
-        Incorrect Labels
+        Your Incorrect Labels
     </button>
 
     <div class="collapse mt-3" id="incorrectLabels">
         <div class="row">
-            {% for filename, user_label, correct_label in incorrect %}
+            {% for filename, user_label, correct_label, session_id in incorrect %}
                 <div class="col-md-4 mb-3">
                     <img src="https://agro-ai-maize.s3.us-east-2.amazonaws.com/images_compressed/{{ filename }}" alt="Incorrect Image" class="img-fluid">
-                    <p><strong>Your Label:</strong> {{ user_label }} | <strong>Correct Label:</strong> {{ correct_label }}</p>
+                    <p><strong>Your Label:</strong> {{ user_label }} | <strong>Correct Label:</strong> {{ correct_label }} | <strong>Session:</strong> {{ session_id }}</p>
                 </div>
             {% endfor %}
         </div>
     </div>
-    {% else %}
-    <p>You haven't labeled any images yet.</p>
-    {% endif %}
 
     {% if top_mislabeled_images %}
     <hr>
