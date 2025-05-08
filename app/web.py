@@ -341,10 +341,6 @@ def get_most_mislabeled_image(user, model):
     
     most_mislabeled = sorted(mislabel_counts.items(), key=lambda x: x[1], reverse=True)[:3]
     most_mislabeled = {item[0]: item[1] for item in most_mislabeled}
-    if most_mislabeled:
-        print(most_mislabeled)
-        for filename, count in most_mislabeled.items():
-            print(f"Image: {filename}, Mislabeled Count: {count}")
     return most_mislabeled
 
 @app.before_request
@@ -529,6 +525,9 @@ def label():
     elif form.is_submitted() and session['queue'] != []:
         session['labels'].append(form.choice.data)
         return renderLabel(form)
+    
+    else:
+        return initializeAL(form, .7)
 
     return render_template('label.html', form=form, confidence=latest_confidence)
 
