@@ -5,7 +5,7 @@ This method is responsible for the inner workings of the different web pages in 
 from flask import Flask, g, render_template, flash, redirect, url_for, session, request, jsonify
 from flask_login import LoginManager, login_user, login_required, current_user, logout_user
 from app import app, db
-from app.models import User, Label, Image
+from app.models import User, Label, Image, Session
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from app.DataPreprocessing import DataPreprocessing
@@ -165,13 +165,6 @@ def prepairResults(form):
     session['labels'].append(form.choice.data)
     session['sample'] = tuple(zip(session['sample_idx'], session['labels']))
     
-    # Ensure user is logged in and user_id is available
-    if not current_user.is_authenticated:
-        return redirect(url_for('login'))
-
-    # Retrieve user_id from the logged-in user (current_user)
-    user_id = current_user.id
-    
     # Prepare training data
     if session['train'] is not None:
         session['train'] = session['train'] + session['sample']
@@ -185,15 +178,6 @@ def prepairResults(form):
     session['confidence'] = float(np.mean(ml_model.K_fold()))
     confidence_score = session['confidence']
     
-    #loops through session['session'] and adds the image and label to the database
-    for filename, label in session['sample']:
-        new_image = Image(filename=filename, user_id=user_id, label=label)
-        db.session.add(new_image)
-        db.session.commit()
-        new_label = Label(text=label, image_id=new_image.id, user_id=user_id, confidence=confidence_score)
-        db.session.add(new_label)
-        db.session.commit()
-    
     session['confidence'] = np.mean(ml_model.K_fold())
     session['labels'] = []
 
@@ -203,7 +187,45 @@ def prepairResults(form):
     else:
         test_set = data.loc[session['test'], :]
         health_pic_user, blight_pic_user, health_pic, blight_pic, health_pic_prob, blight_pic_prob = ml_model.infoForResults(train_img_names, test_set)
-        return render_template('final.html', form = form, confidence = "{:.2%}".format(round(session['confidence'],4)), health_user = health_pic_user, blight_user = blight_pic_user, healthNum_user = len(health_pic_user), blightNum_user = len(blight_pic_user), health_test = health_pic, unhealth_test = blight_pic, healthyNum = len(health_pic), unhealthyNum = len(blight_pic), healthyPct = "{:.2%}".format(len(health_pic)/(200-(len(health_pic_user)+len(blight_pic_user)))), unhealthyPct = "{:.2%}".format(len(blight_pic)/(200-(len(health_pic_user)+len(blight_pic_user)))), h_prob = health_pic_prob, b_prob = blight_pic_prob)
+        
+        # Ensure user is logged in and user_id is available
+        if not current_user.is_authenticated:
+            return redirect(url_for('login'))
+
+        # Retrieve user_id from the logged-in user (current_user)
+        user_id = current_user.id
+        
+        new_session = Session(user_id=user_id)
+        db.session.add(new_session)
+        db.session.commit()
+        
+        user_confidence = session['confidence']
+        
+        save_to_database(health_pic_user, 'H', user_id, user_confidence, False, new_session.id)
+        save_to_database(blight_pic_user, 'B', user_id, user_confidence, False, new_session.id)
+        save_to_database(health_pic, 'H', user_id, health_pic_prob, True, new_session.id)
+        save_to_database(blight_pic, 'B', user_id, blight_pic_prob, True, new_session.id)
+        
+        session.pop('model', None)
+        
+        return render_template('final.html', form = form, confidence = "{:.2%}".format(round(user_confidence,4)), health_user = health_pic_user, blight_user = blight_pic_user, healthNum_user = len(health_pic_user), blightNum_user = len(blight_pic_user), health_test = health_pic, unhealth_test = blight_pic, healthyNum = len(health_pic), unhealthyNum = len(blight_pic), healthyPct = "{:.2%}".format(len(health_pic)/(200-(len(health_pic_user)+len(blight_pic_user)))), unhealthyPct = "{:.2%}".format(len(blight_pic)/(200-(len(health_pic_user)+len(blight_pic_user)))), h_prob = health_pic_prob, b_prob = blight_pic_prob)
+
+def save_to_database(image, label, user_id, confidence_score, model, session_id):
+    for i, img in enumerate(image):
+        # Check if the image already exists in the database
+        existing_image = Image.query.filter_by(filename=img).first()
+        if not existing_image:
+            new_image = Image(filename=img, user_id=user_id, label=label)
+            db.session.add(new_image)
+            db.session.commit()
+            image_id = new_image.id
+        else:
+            image_id = existing_image.id
+
+        confidence = confidence_score[i] if model else confidence_score
+        new_label = Label(text=label, image_id=image_id, user_id=user_id, confidence=confidence, model=model, session_id=session_id)
+        db.session.add(new_label)
+        db.session.commit()
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -237,51 +259,89 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-def calculate_user_accuracy(return_counts=False):
+def calculate_accuracy(user, model, per_user, return_counts=False):
     base = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.join(base, 'data', 'csvOut.xlsx')
     df = pd.read_excel(file_path, usecols=[0, 16], header=None)
     df.columns = ['filename', 'true_label']
     ground_truth = dict(zip(df['filename'], df['true_label']))
 
-    user_images = Image.query.filter_by(user_id=current_user.id).all()
+    if not current_user.is_authenticated:
+            flash('User not authenticated. Please log in.', 'danger')
+            return redirect(url_for('login'))
 
+    if not per_user:    
+        if user == "all":
+            images = (db.session.query(Image.filename, Label.text, Session.id)
+                            .join(Label, Image.id == Label.image_id)      
+                            .join(Session, Label.session_id == Session.id) 
+                            .filter(Label.model == model).all())
+        elif user == "user":
+            images = (db.session.query(Image.filename, Label.text, Session.id)
+                            .join(Label, Image.id == Label.image_id)      
+                            .join(Session, Label.session_id == Session.id) 
+                            .filter(Label.user_id == current_user.id, Label.model == model).all())
+    else:
+        images = (db.session.query(Image.filename, Label.text, Session.id)
+                .join(Label, Image.id == Label.image_id)      
+                .join(Session, Label.session_id == Session.id) 
+                .filter(Label.user_id == user, Label.model == model).all())
+        
     total = 0
     correct = 0
     incorrect_images = []
 
-    for img in user_images:
-        true_label = ground_truth.get(img.filename)
+    for filename, label, session_id in images:
+        true_label = ground_truth.get(filename)
         if true_label:
             total += 1
-            if img.label.upper() == str(true_label).upper():
+            if label.upper() == str(true_label).upper():
                 correct += 1
             else:
-                incorrect_images.append((img.filename, img.label, true_label))
+                incorrect_images.append((filename, label, true_label, session_id))
 
     accuracy = round((correct / total) * 100, 2) if total > 0 else 0
-    return (accuracy, total, correct, incorrect_images) if return_counts else accuracy
+    
+    if not per_user:
+        return (accuracy, total, correct, incorrect_images) if return_counts else accuracy
+    else:
+        return accuracy if return_counts else accuracy
 
-def get_most_mislabeled_image():
+def get_most_mislabeled_image(user, model):
     base = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.join(base, 'data', 'csvOut.xlsx')
     df = pd.read_excel(file_path, usecols=[0, 16], header=None)
     df.columns = ['filename', 'true_label']
     ground_truth = dict(zip(df['filename'], df['true_label']))
-
-    all_images = Image.query.all()
+    
     mislabel_counts = defaultdict(int)
+    
+    if not current_user.is_authenticated:
+        flash('User not authenticated. Please log in.', 'danger')
+        return redirect(url_for('login'))
 
-    for img in all_images:
-        true_label = ground_truth.get(img.filename)
-        if true_label and img.label.upper() != str(true_label).upper():
-            mislabel_counts[img.filename] += 1
+    if user == "all":
+        images = (db.session.query(Image.filename, Label.text, Session.id)
+                        .join(Label, Image.id == Label.image_id)      
+                        .join(Session, Label.session_id == Session.id) 
+                        .filter(Label.model == model).all())
+    elif user == "user":
+        images = (db.session.query(Image.filename, Label.text, Session.id)
+                        .join(Label, Image.id == Label.image_id)      
+                        .join(Session, Label.session_id == Session.id) 
+                        .filter(Label.user_id == current_user.id, Label.model == model).all())
+
+    for filename, label, session_id in images:
+        true_label = ground_truth.get(filename)
+        if true_label and label.upper() != str(true_label).upper():
+            mislabel_counts[filename] += 1
 
     if not mislabel_counts:
         return None
-
-    most_mislabeled = max(mislabel_counts.items(), key=lambda x: x[1])
-    return {"filename": most_mislabeled[0], "count": most_mislabeled[1]}
+    
+    most_mislabeled = sorted(mislabel_counts.items(), key=lambda x: x[1], reverse=True)[:3]
+    most_mislabeled = {item[0]: item[1] for item in most_mislabeled}
+    return most_mislabeled
 
 @app.before_request
 def before_request():
@@ -365,27 +425,65 @@ def profile():
 @app.route('/saved')
 @login_required
 def saved():
-    healthy_plants = Image.query.filter_by(user_id=current_user.id, label='H').all()
-    unhealthy_plants = Image.query.filter_by(user_id=current_user.id, label='B').all()
+    user_healthy_plants = (db.session.query(Image, Session.id, Session.timestamp)
+                        .join(Label, Image.id == Label.image_id)      
+                        .join(Session, Label.session_id == Session.id) 
+                        .filter(Label.user_id == current_user.id, Label.text == 'H', Label.model == False).all())
+    user_unhealthy_plants = (db.session.query(Image, Session.id, Session.timestamp)
+                        .join(Label, Image.id == Label.image_id)      
+                        .join(Session, Label.session_id == Session.id) 
+                        .filter(Label.user_id == current_user.id, Label.text == 'B', Label.model == False).all())
+    healthy_plants = (db.session.query(Image, Session.id, Session.timestamp)
+                        .join(Label, Image.id == Label.image_id)      
+                        .join(Session, Label.session_id == Session.id) 
+                        .filter(Label.user_id == current_user.id, Label.text == 'H', Label.model == True).all())
+    unhealthy_plants = (db.session.query(Image, Session.id, Session.timestamp)
+                        .join(Label, Image.id == Label.image_id)      
+                        .join(Session, Label.session_id == Session.id) 
+                        .filter(Label.user_id == current_user.id, Label.text == 'B', Label.model == True).all())
 
+    user_healthy_count = len(user_healthy_plants)
+    user_unhealthy_count = len(user_unhealthy_plants)
     healthy_count = len(healthy_plants)
     unhealthy_count = len(unhealthy_plants)
 
+    user_healthy_plants_data = [{
+        'image_url': f"https://agro-ai-maize.s3.us-east-2.amazonaws.com/images_compressed/{plant.filename}",
+        'name': plant.filename,
+        'details_url': f"/image/{plant.id}",
+        'timestamp': format_timestamp(timestamp),
+        'session_id': session_id
+    } for plant, session_id, timestamp in user_healthy_plants]
+
+    user_unhealthy_plants_data = [{
+        'image_url': f"https://agro-ai-maize.s3.us-east-2.amazonaws.com/images_compressed/{plant.filename}",
+        'name': plant.filename,
+        'details_url': f"/image/{plant.id}",
+        'timestamp': format_timestamp(timestamp),
+        'session_id': session_id
+    } for plant, session_id, timestamp in user_unhealthy_plants]
+    
     healthy_plants_data = [{
         'image_url': f"https://agro-ai-maize.s3.us-east-2.amazonaws.com/images_compressed/{plant.filename}",
         'name': plant.filename,
         'details_url': f"/image/{plant.id}",
-        'timestamp': format_timestamp(plant.timestamp)
-    } for plant in healthy_plants]
-
+        'timestamp': format_timestamp(timestamp),
+        'session_id': session_id
+    } for plant, session_id, timestamp in healthy_plants]
+    
     unhealthy_plants_data = [{
         'image_url': f"https://agro-ai-maize.s3.us-east-2.amazonaws.com/images_compressed/{plant.filename}",
         'name': plant.filename,
         'details_url': f"/image/{plant.id}",
-        'timestamp': format_timestamp(plant.timestamp)
-    } for plant in unhealthy_plants]
+        'timestamp': format_timestamp(timestamp),
+        'session_id': session_id
+    } for plant, session_id, timestamp in unhealthy_plants]
 
     return render_template('saved.html', 
+                           user_healthy_count=user_healthy_count,
+                           user_unhealthy_count=user_unhealthy_count,
+                           user_healthy_plants=user_healthy_plants_data,
+                           user_unhealthy_plants=user_unhealthy_plants_data,
                            healthy_count=healthy_count,
                            unhealthy_count=unhealthy_count,
                            healthy_plants=healthy_plants_data,
@@ -427,6 +525,9 @@ def label():
     elif form.is_submitted() and session['queue'] != []:
         session['labels'].append(form.choice.data)
         return renderLabel(form)
+    
+    else:
+        return initializeAL(form, .7)
 
     return render_template('label.html', form=form, confidence=latest_confidence)
 
@@ -464,24 +565,69 @@ def feedback(h_list,u_list,h_conf_list,u_conf_list):
 @app.route('/analytics')
 @login_required
 def analytics():
-    accuracy, total, correct, incorrect_images = calculate_user_accuracy(return_counts=True)
+    user_accuracy, user_total, user_correct, user_incorrect_images = calculate_accuracy("user", False, False, return_counts=True)
+    user_model_accuracy, user_model_total, user_model_correct, user_model_incorrect_images = calculate_accuracy("user", True, False, return_counts=True)
+    all_user_accuracy, all_user_total, all_user_correct, all_user_incorrect_images = calculate_accuracy("all", False, False, return_counts=True)
+    all_model_accuracy, all_model_total, all_model_correct, all_model_incorrect_images = calculate_accuracy("all", True, False, return_counts=True)
 
-    top_mislabeled = (
-    db.session.query(Image.filename, func.count().label('count'))
-    .filter(Image.label.isnot(None))
-    .group_by(Image.filename)
-    .order_by(func.count().desc())
-    .limit(3)
-    .all()
-)
-
-    top_mislabeled_images = [{'filename': img.filename, 'count': img.count} for img in top_mislabeled]
+    top_mislabeled_images_user = get_most_mislabeled_image("user", False)
+    top_mislabeled_images_all_users = get_most_mislabeled_image("all", False)
+    top_mislabeled_images_user_model = get_most_mislabeled_image("user", True)
+    top_mislabeled_images_all_users_model = get_most_mislabeled_image("all", True)
+    top_user_accuracy = get_top_users(False) #done-web
+    top_user_models_accuracy = get_top_users(True) #done-web
+    top_user_image_model_confidence = get_top_confidence() #done-web
 
     return render_template('analytics.html', 
-                           accuracy=accuracy, 
-                           total=total, 
-                           correct=correct, 
-                           incorrect=incorrect_images, 
-                           top_mislabeled_images=top_mislabeled_images)
+                            user_accuracy=user_accuracy, 
+                            user_total=user_total, 
+                            user_correct=user_correct, 
+                            user_incorrect_images=user_incorrect_images,
+                            user_model_accuracy=user_model_accuracy,
+                            user_model_total=user_model_total,    
+                            user_model_correct=user_model_correct,
+                            user_model_incorrect_images=user_model_incorrect_images,
+                            all_user_accuracy=all_user_accuracy,
+                            all_user_total=all_user_total,
+                            all_user_correct=all_user_correct,
+                            all_user_incorrect_images=all_user_incorrect_images,
+                            all_model_accuracy=all_model_accuracy,
+                            all_model_total=all_model_total,
+                            all_model_correct=all_model_correct,
+                            all_model_incorrect_images=all_model_incorrect_images, 
+                            top_mislabeled_images_user=top_mislabeled_images_user,
+                            top_mislabeled_images_all_users=top_mislabeled_images_all_users,
+                            top_mislabeled_images_user_model=top_mislabeled_images_user_model,
+                            top_mislabeled_images_all_users_model=top_mislabeled_images_all_users_model,
+                            top_user_accuracy = top_user_accuracy,
+                            top_user_models_accuracy = top_user_models_accuracy,
+                            top_user_image_model_confidence = top_user_image_model_confidence)
+    
+def get_top_users(model):
+    users = (db.session.query(User.id, User.email)
+             .all())
+
+    user_accuracies = []
+
+    for user_id, email in users:
+        accuracy = calculate_accuracy(user_id, model, True, return_counts=False)
+        user_accuracies.append((email, accuracy))
+    
+    # Sort users by accuracy in descending order and take the top 5
+    top_users = sorted(user_accuracies, key=lambda x: x[1], reverse=True)[:5]
+
+    return top_users
+
+def get_top_confidence():
+    return (db.session.query(Image.filename, Label.confidence, Session.id, Label.text)
+            .join(Label, Image.id == Label.image_id)
+            .join(Session, Label.session_id == Session.id)
+            .filter(Label.user_id == current_user.id, Label.model == True)
+            .group_by(Image.filename)
+            .order_by(Label.confidence.desc())
+            .limit(3)
+            .all())
+
+
 
 #app.run( host='127.0.0.1', port=5000, debug='True', use_reloader = False)

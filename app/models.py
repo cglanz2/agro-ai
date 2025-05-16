@@ -21,11 +21,17 @@ class Image(db.Model):
     filename = db.Column(db.String(255), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     label = db.Column(db.String(1), nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Label(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(255), nullable=False)
-    image_id = db.Column(db.Integer, db.ForeignKey('image.id'), nullable=True)
+    image_id = db.Column(db.Integer, db.ForeignKey('image.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     confidence = db.Column(db.Float, default=0.0)
+    model = db.Column(db.Boolean, nullable=False)
+    session_id = db.Column(db.Integer, db.ForeignKey('session.id'), nullable=False)
+    
+class Session(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.now)
